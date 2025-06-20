@@ -36,6 +36,10 @@ app.get('/api/protected', protect, (req, res) => {
   res.json({ message: `Welcome ${req.user.username}! This is a protected route.` });
 });
 
+app.get('/getproduct/all',(req,res)=()=>
+{
+  
+})
 
 // Start server
 app.listen(PORT, () => {
