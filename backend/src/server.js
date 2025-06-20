@@ -4,6 +4,7 @@ const { connectDB, sequelize } = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const User = require('./models/User'); // Import User model
 const OTP = require('./models/OTP');   // <--- Import OTP model
+const Product = require('./models/Product');
 
 require('dotenv').config();
 
@@ -36,10 +37,30 @@ app.get('/api/protected', protect, (req, res) => {
   res.json({ message: `Welcome ${req.user.username}! This is a protected route.` });
 });
 
-app.get('/getproduct/all',(req,res)=()=>
-{
-  
-})
+// Products api 
+
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await Product.findAll();
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json(product);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 // Start server
 app.listen(PORT, () => {
