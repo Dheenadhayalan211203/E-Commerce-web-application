@@ -24,7 +24,13 @@ const User = sequelize.define('User', {
   password: { // This column will now directly store the hash from signupRequestOtp
     type: DataTypes.STRING,
     allowNull: false,
-  },
+  }, 
+    role:{
+      type:DataTypes.STRING,
+      allowNull:false
+    },
+  
+  
 }, {
   tableName: 'User',
   timestamps: true,
