@@ -14,12 +14,17 @@ import SignupPage from "./pages/SignupPage";
 import authService from "./api/auth";
 import Navigation from "./components/Navigationbar";
 import ProductDisplay from "./components/productdisplay";
+import HomePage from "./pages/HomePage";
+ 
+import NotFoundPage from "./pages/NotFoundPage";
+import Product from "./pages/Productdescription";
+import Adminproductadd from "./pages/Adminproductadd";
 
-const usecontext=createContext();
+export const usecontext=createContext();
 
-// Basic Home Page component for demonstration
-const HomePageContent = () => {
-  const navigate = useNavigate();
+function App() {
+
+  
   const [user, setUser] = useState(null);
    
 
@@ -28,6 +33,8 @@ const HomePageContent = () => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+     
   }, []);
 
   const handleLogout = () => {
@@ -36,26 +43,27 @@ const HomePageContent = () => {
     navigate("/login");
     window.location.reload(); // Force reload to clear state
   };
-
- return (
-  <>
-    <div>
-      {user ? <div><Navigation /></div> : <div>User is not logged in</div>}
-    </div>
-  </>
-);
-};
-
-function App() {
   return (
+    <>
+      
+      <usecontext.Provider value={ {user,handleLogout}}> 
+         
     <Router>
       <Routes>
-        <Route path="/" element={<HomePageContent />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+         <Route path="/product/:id" element={<Product />} />
+         <Route path="/admin/product" element={<Adminproductadd />} />
+
         {/* Add more routes for your e-commerce site */}
       </Routes>
     </Router>
+    </usecontext.Provider>
+
+    </>
+
+     
   );
 }
 

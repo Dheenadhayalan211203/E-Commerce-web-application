@@ -2,10 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const { connectDB, sequelize } = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
-const User = require('./models/User'); // Import User model
-const OTP = require('./models/OTP');   // <--- Import OTP model
+const User = require('./models/User');
+const OTP = require('./models/OTP');
 const Product = require('./models/Product');
-
 require('dotenv').config();
 
 const app = express();
@@ -14,50 +13,124 @@ const PORT = process.env.PORT || 5000;
 // Connect to database
 connectDB();
 
-// Sync database models (creates tables if they don't exist)
-// We need to sync both User and OTP models
-sequelize.sync()
-  .then(() => {
-    console.log('Database synced successfully.');
-  })
-  .catch((err) => {
-    console.error('Error syncing database:', err);
-  });
+// CORS Configuration
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
 
 // Middleware
-app.use(express.json()); // Body parser for JSON data
-app.use(cors()); // Allow all CORS requests for now, configure specific origins in production
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Sync database models
+sequelize.sync()
+  .then(() => console.log('Database synced successfully.'))
+  .catch(err => console.error('Error syncing database:', err));
 
 // Routes
 app.use('/api/auth', authRoutes);
 
-// Example protected route (just for demonstration)
+// Protected route example
 const { protect } = require('./middleware/authMiddleware');
 app.get('/api/protected', protect, (req, res) => {
-  res.json({ message: `Welcome ${req.user.username}! This is a protected route.` });
+  res.json({ message: `Welcome ${req.user.username}!` });
 });
 
-// Products api 
+// Product API Endpoints
 
- // ... (your existing code remains the same until the products API section)
+// Create Product Endpoint (Optimized Version)
+app.post('/api/admin/products', async (req, res) => {
+  try {
+    // Validate required fields
+    if (!req.body.name || !req.body.brand || req.body.price === undefined) {
+      return res.status(400).json({
+        error: 'Name, brand, and price are required fields'
+      });
+    }
 
-// Products API
+    // Prepare product data
+    const productData = {
+      name: req.body.name,
+      brand: req.body.brand,
+      flavors_data: req.body.flavors_data || [],
+      nicotine_level: req.body.nicotine_level || null,
+      description: req.body.description || null,
+      image_base64: req.body.image_base64 || null,
+      price: parseFloat(req.body.price),
+      stock: parseInt(req.body.stock) || 0,
+      category: req.body.category || null,
+      product_group: req.body.product_group || null,
+      is_active: true
+    };
+
+    // Create the product using Sequelize model
+    const product = await Product.create(productData);
+
+    // Format the response
+    const responseData = product.toJSON();
+    try {
+      responseData.flavors = responseData.flavors_data ? 
+                           JSON.parse(responseData.flavors_data) : 
+                           [];
+    } catch (e) {
+      console.error('Error parsing flavors_data in response:', e);
+      responseData.flavors = [];
+    }
+    delete responseData.flavors_data;
+
+    res.status(201).json({
+      message: 'Product created successfully',
+      product: responseData
+    });
+
+  } catch (error) {
+    console.error('Error creating product:', error);
+    
+    let errorMessage = 'Failed to create product';
+    let errorDetails = '';
+    
+    if (error.name === 'SequelizeValidationError') {
+      errorMessage = 'Validation error';
+      errorDetails = error.errors.map(err => err.message).join(', ');
+    } else if (error.response) {
+      errorMessage = error.response.data.error || errorMessage;
+      errorDetails = error.response.data.details || 
+                   (typeof error.response.data === 'string' ? error.response.data : '');
+    }
+
+    res.status(500).json({
+      error: `${errorMessage} ${errorDetails ? `- ${errorDetails}` : ''}`.trim()
+    });
+  }
+});
+
+// Get All Products
 app.get('/api/products', async (req, res) => {
   try {
-    const [products] = await sequelize.query('SELECT * FROM products');
-    res.json(products);
+    const [products] = await sequelize.query('SELECT * FROM products WHERE is_active = true');
+    
+    const productsWithFlavors = products.map(product => ({
+      ...product,
+      flavors: product.flavors_data ? JSON.parse(product.flavors_data) : []
+    }));
+
+    res.json(productsWithFlavors);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Get product by ID
+// Get Product by ID
 app.get('/api/products/:id', async (req, res) => {
   try {
     const productId = req.params.id;
     
-    // Validate ID is a number (adjust regex if using UUIDs)
     if (!/^\d+$/.test(productId)) {
       return res.status(400).json({ error: 'Invalid product ID format' });
     }
@@ -71,124 +144,15 @@ app.get('/api/products/:id', async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    res.json(product[0]); // Return the first matching product
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// Get products by category
-app.get('/api/products/category/:category', async (req, res) => {
-  try {
-    const category = req.params.category;
-    
-    // Basic validation
-    if (!category || typeof category !== 'string') {
-      return res.status(400).json({ error: 'Category is required' });
-    }
-
-    const [products] = await sequelize.query(
-      'SELECT * FROM products WHERE category = ?',
-      { replacements: [category] }
-    );
-
-    if (!products || products.length === 0) {
-      return res.status(404).json({ 
-        error: 'No products found in this category',
-        category: category
-      });
-    }
-
     res.json({
-      success: true,
-      count: products.length,
-      category: category,
-      products: products
+      ...product[0],
+      flavors: product[0].flavors_data ? JSON.parse(product[0].flavors_data) : []
     });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-// Admin Product Creation API
-app.post('/api/admin/products', protect, async (req, res) => {
-  try {
-    // Verify admin status (add this check to your authMiddleware)
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ error: 'Unauthorized access' });
-    }
-
-    const {
-      name,
-      brand,
-      flavors_data, // Array of {name, image} objects
-      nicotine_level,
-      description,
-      image_base64,
-      price,
-      stock,
-      category,
-      product_group,
-      is_active = true
-    } = req.body;
-
-    // Basic validation
-    if (!name || !brand || price === undefined) {
-      return res.status(400).json({ error: 'Name, brand, and price are required' });
-    }
-
-    // Convert flavors array to JSON string
-    const flavorsJson = flavors_data ? JSON.stringify(flavors_data) : null;
-
-    // Insert product using raw query to match your existing pattern
-    const [result] = await sequelize.query(
-      `INSERT INTO products (
-        name, brand, flavors_data, nicotine_level, 
-        description, image_base64, price, stock,
-        category, product_group, is_active, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      {
-        replacements: [
-          name,
-          brand,
-          flavorsJson,
-          nicotine_level || null,
-          description || null,
-          image_base64 || null,
-          parseFloat(price),
-          stock ? parseInt(stock) : 0,
-          category || null,
-          product_group || null,
-          is_active
-        ]
-      }
-    );
-
-    // Get the inserted product
-    const [insertedProduct] = await sequelize.query(
-      'SELECT * FROM products WHERE id = ?',
-      { replacements: [result.insertId] }
-    );
-
-    // Parse flavors_data for the response
-    const productWithFlavors = {
-      ...insertedProduct[0],
-      flavors: flavors_data || []
-    };
-
-    res.status(201).json({
-      success: true,
-      product: productWithFlavors
-    });
-
-  } catch (error) {
-    console.error('Error creating product:', error);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
 
 // Start server
 app.listen(PORT, () => {

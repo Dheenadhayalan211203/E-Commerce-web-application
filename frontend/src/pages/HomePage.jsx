@@ -3,6 +3,9 @@ import React , { useState, useEffect } from 'react';
 import Navigation from "../components/Navigationbar";
 import ProductDisplay from "../components/productdisplay";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import ProductCard from '../components/Productcard';
+import './Homepage.css'
+import AdminProductForm from '../components/Adminprad';
  
 
 /*const HomePage = ({ user, onLogout }) => {
@@ -47,12 +50,23 @@ const navigate = useNavigate();
     window.location.reload(); // Force reload to clear state
   };
 
+  console.log(user)
+
   return (
      
      <>
-      
+       <div className="hompg">
+        
         <Navigation  />
-        <ProductDisplay />
+         
+         <div className="pr">
+              <ProductCard/>
+               
+               
+         </div>
+         <AdminProductForm/>
+       </div>
+        
      </>
   );
 }

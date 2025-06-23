@@ -1,147 +1,135 @@
-import React, { useState } from 'react';
-import { FiPlus, FiMinus, FiShoppingCart } from 'react-icons/fi';
-import { FaChevronDown } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import "./productdisplay.css"
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import './Productdisplay.css';
 
-const ProductDisplay = ({ user }) => {
-  const [selectedFlavor, setSelectedFlavor] = useState('');
-  const [quantity, setQuantity] = useState(1);
-  const [isFlavorDropdownOpen, setIsFlavorDropdownOpen] = useState(false);
+const Productdisplay = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  // Sample product data
-  const product = {
-    name: "Premium Esp Vape 500 ",
-    description: "Experience the rich aroma with limited Nicotin level.",
-    price: 24.99,
-    flavors: [ "Dark Roast", "Vanilla", "Hazelnut", "Caramel"],
-    rating: 4.8,
-    reviews: 124,
-  };
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedFlavor, setSelectedFlavor] = useState(null);
+  const [mainImage, setMainImage] = useState('');
+  const [flavors, setFlavors] = useState([]);
 
-  const toggleFlavorDropdown = () => {
-    setIsFlavorDropdownOpen(!isFlavorDropdownOpen);
-  };
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const data = res.data;
+        setProduct(data);
 
-  const selectFlavor = (flavor) => {
+        let parsedFlavors = [];
+        if (data.flavors_data) {
+          const parsed = JSON.parse(data.flavors_data);
+          parsedFlavors = parsed.flavours || [];
+          setFlavors(parsedFlavors);
+
+          if (parsedFlavors.length > 0) {
+            setSelectedFlavor(parsedFlavors[0]);
+            setMainImage(`data:image/jpeg;base64,${parsedFlavors[0].imagestring}`);
+          }
+        } else if (data.image_base64) {
+          setMainImage(`data:image/jpeg;base64,${data.image_base64}`);
+        }
+
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  const handleFlavorChange = (e) => {
+    const selectedName = e.target.value;
+    const flavor = flavors.find(f => f.flr === selectedName);
     setSelectedFlavor(flavor);
-    setIsFlavorDropdownOpen(false);
-  };
-
-  const increaseQuantity = () => {
-    setQuantity(prev => prev + 1);
-  };
-
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(prev => prev - 1);
+    if (flavor?.imagestring) {
+      setMainImage(`data:image/jpeg;base64,${flavor.imagestring}`);
     }
   };
 
-  const addToCart = () => {
-    if (!user) {
-      alert('Please login to add items to your cart');
-      return;
-    }
-    alert(`Added ${quantity} ${quantity > 1 ? 'items' : 'item'} of ${product.name}${selectedFlavor ? ` (${selectedFlavor})` : ''} to cart!`);
-  };
+  if (loading) return <div className="loading">Loading product details...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
+  if (!product) return <div className="not-found">Product not found</div>;
 
   return (
-    <div className="product-display">
-      <div className="product-image-container">
-        <div className="product-image-placeholder">
-          <span> <img src="https://th.bing.com/th/id/OIP.TUGXsWW3BWeBPX9_a550ZQHaHa?w=161&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="" /></span>
-        </div>
-      </div>
+    <div className="product-page">
+      <button onClick={() => navigate(-1)} className="back-button">
+        &larr; Back
+      </button>
 
-      <div className="product-details">
-        <h1 className="product-name">{product.name}</h1>
-        
-        {user && <div className="member-badge">Member Exclusive</div>}
-        
-        <div className="product-rating">
-          {[...Array(5)].map((_, i) => (
-            <span 
-              key={i} 
-              className={`star ${i < Math.floor(product.rating) ? 'filled' : ''}${i === Math.floor(product.rating) && product.rating % 1 > 0 ? ' half-filled' : ''}`}
-            >
-              ★
-            </span>
-          ))}
-          <span className="review-count">({product.reviews} reviews)</span>
+      <div className="product-container">
+        <div className="product-images">
+          <div className="main-image-container">
+            <img
+              src={mainImage}
+              alt={selectedFlavor ? selectedFlavor.flr : product.name}
+              className="main-image"
+              key={mainImage}
+            />
+          </div>
         </div>
 
-        <p className="product-description">{product.description}</p>
+        <div className="product-details">
+          <h1 className="product-name">{product.name}</h1>
+          {product.brand && (
+            <div className="product-brand">Brand: {product.brand}</div>
+          )}
 
-        <div className="flavor-selector">
-          <label>Flavor:</label>
-          <div className="flavor-dropdown">
-            <button 
-              className="dropdown-toggle" 
-              onClick={toggleFlavorDropdown}
-            >
-              {selectedFlavor || "Select a flavor"} <FaChevronDown className="dropdown-icon" />
-            </button>
-            {isFlavorDropdownOpen && (
-              <div className="dropdown-menu">
-                {product.flavors.map((flavor, index) => (
-                  <div 
-                    key={index} 
-                    className="dropdown-item"
-                    onClick={() => selectFlavor(flavor)}
-                  >
-                    {flavor}
-                  </div>
+          {flavors.length > 0 && (
+            <div className="flavor-selection">
+              <h3>Select Flavor:</h3>
+              <select onChange={handleFlavorChange} value={selectedFlavor?.flr || ''}>
+                {flavors.map((flavor, idx) => (
+                  <option key={idx} value={flavor.flr}>
+                    {flavor.flr}
+                  </option>
                 ))}
-              </div>
-            )}
+              </select>
+            </div>
+          )}
+
+          <div className="product-price">${product.price }</div>
+
+          <div className={`product-stock ${product.stock > 0 ? 'in-stock' : 'out-of-stock'}`}>
+            {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
           </div>
-        </div>
 
-        <div className="price-container">
-          <span className="price">${user ? (product.price * 0.9).toFixed(2) : product.price.toFixed(2)}</span>
-          {user && <span className="discount-badge">10% OFF</span>}
-          <span className="price-label">/ 12oz bag</span>
-         
-        </div>
+          {product.nicotine_level && (
+            <div className="nicotine-level">
+              Nicotine Level: {product.nicotine_level}
+            </div>
+          )}
 
-        <div className="quantity-selector">
-          <button 
-            className="quantity-btn" 
-            onClick={decreaseQuantity}
-            disabled={quantity <= 1}
-          >
-            <FiMinus />
-          </button>
-          <span className="quantity">{quantity}</span>
-          <button 
-            className="quantity-btn" 
-            onClick={increaseQuantity}
-          >
-            <FiPlus />
-          </button>
-        </div>
+          {product.description && (
+            <div className="product-description">
+              <h3>Description:</h3>
+              <p>{product.description}</p>
+            </div>
+          )}
 
-        <button 
-          className="add-to-cart-btn" 
-          onClick={addToCart}
-          disabled={!selectedFlavor}
-        >
-          <FiShoppingCart className="cart-icon" /> 
-          Add to Cart - ${((user ? product.price * 0.9 : product.price) * quantity).toFixed(2)}
-        </button>
-
-        <div className="product-meta">
-          <div className="meta-item">
-            <span className="meta-label">Availability:</span>
-            <span className="meta-value in-stock">In Stock (25+ items)</span>
+          <div className="product-actions">
+            <button className="wishlist-button" onClick={() => console.log('Added to wishlist')}>
+              <i className="fa fa-heart"></i> Add to Wishlist
+            </button>
+            <button
+              className="add-to-cart-button"
+              disabled={product.stock <= 0}
+              onClick={() => console.log('Added to cart')}
+            >
+              <i className="fa fa-shopping-cart"></i> Add to Cart
+            </button>
           </div>
-          <div className="meta-item">
-           
-          </div>
-          <div className="meta-item">
-            <span className="meta-label">Category:</span>
-            <span className="meta-value">vape</span>
+
+          <div className="product-meta">
+            <div className="product-category">Category: {product.category || 'Uncategorized'}</div>
+            <div className="product-status">Status: {product.is_active ? 'Active' : 'Inactive'}</div>
           </div>
         </div>
       </div>
@@ -149,4 +137,4 @@ const ProductDisplay = ({ user }) => {
   );
 };
 
-export default ProductDisplay;
+export default Productdisplay;

@@ -1,0 +1,233 @@
+/* Base Styles */
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+.not-found-content {
+  text-align: center;
+  z-index: 2;
+  padding: 2rem;
+  max-width: 800px;
+}
+
+/* Stars Background */
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+/* Glitch Effect */
+.glitch-container {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.glitch {
+  font-size: 8rem;
+  font-weight: 800;
+  position: relative;
+  margin: 0;
+  line-height: 1;
+  color: #fff;
+}
+
+.glitch::before, .glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00c1;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  left: -2px;
+  text-shadow: -2px 0 #00fff9;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(31px, 9999px, 94px, 0); }
+  20% { clip: rect(112px, 9999px, 76px, 0); }
+  40% { clip: rect(75px, 9999px, 107px, 0); }
+  60% { clip: rect(42px, 9999px, 130px, 0); }
+  80% { clip: rect(84px, 9999px, 108px, 0); }
+  100% { clip: rect(37px, 9999px, 115px, 0); }
+}
+
+@keyframes glitch-anim2 {
+  0% { clip: rect(65px, 9999px, 119px, 0); }
+  20% { clip: rect(25px, 9999px, 145px, 0); }
+  40% { clip: rect(50px, 9999px, 120px, 0); }
+  60% { clip: rect(101px, 9999px, 83px, 0); }
+  80% { clip: rect(25px, 9999px, 145px, 0); }
+  100% { clip: rect(98px, 9999px, 54px, 0); }
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  margin-top: -1rem;
+  color: #a1a1ff;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.description {
+  font-size: 1.2rem;
+  margin-bottom: 3rem;
+  color: #c9c9ff;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Astronaut Animation */
+.astronaut {
+  width: 150px;
+  height: 150px;
+  margin: 2rem auto;
+  position: relative;
+}
+
+.helmet {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 0 10px #4d4dff;
+  animation: float 6s ease-in-out infinite;
+}
+
+.face {
+  position: absolute;
+  width: 60%;
+  height: 50%;
+  background: #f2f2f2;
+  border-radius: 50%;
+  top: 25%;
+  left: 20%;
+}
+
+.eyes {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 30%;
+}
+
+.eye {
+  width: 20px;
+  height: 20px;
+  background: #333;
+  border-radius: 50%;
+  animation: blink 4s infinite;
+}
+
+.mouth {
+  width: 30px;
+  height: 10px;
+  background: #333;
+  margin: 10px auto 0;
+  border-radius: 0 0 10px 10px;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes blink {
+  0%, 48%, 52%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+
+/* Home Button */
+.home-button {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #6e45e2, #88d3ce);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.home-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.home-button:active {
+  transform: translateY(-1px);
+}
+
+.button-icon {
+  margin-left: 10px;
+  transition: all 0.3s;
+}
+
+.home-button:hover .button-icon {
+  transform: translateX(5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .glitch {
+    font-size: 5rem;
+  }
+  
+  .subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .description {
+    font-size: 1rem;
+  }
+  
+  .astronaut {
+    width: 120px;
+    height: 120px;
+  }
+}
