@@ -8,6 +8,8 @@ const AdminProductForm = () => {
   const productImageInputRef = useRef(null);
   const flavorImageInputRef = useRef(null);
 
+  
+
   // Initialize form data with proper flavor structure
   const [formData, setFormData] = useState({
     name: '',
@@ -256,7 +258,15 @@ const AdminProductForm = () => {
   const hasErrors = Object.values(errors).some(error => error);
 
   return (
+
+    
     <div className="admin-product-container">
+
+
+ 
+
+
+
        <button onClick={() => navigate(-1)} className="back-button">
         &larr; Back
       </button>

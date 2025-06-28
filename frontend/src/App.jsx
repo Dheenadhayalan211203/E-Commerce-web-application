@@ -43,7 +43,7 @@ function App() {
   const handleLogout = () => {
     authService.logout();
     setUser(null);
-    window.location.href = "/login"; // Using href instead of navigate
+    window.location.href = "/"; // Using href instead of navigate
   };
 
   return (
@@ -56,6 +56,7 @@ function App() {
           <Route path="/product/:id" element={<Product />} />
             <Route path="/notfound" element={<NotFoundPage />} />
             <Route path="/unauthoraised" element={<UnauthorizedAccess />} />
+            <Route path="*" element={<NotFoundPage />} />
           
           <Route
             path="/admin/product"

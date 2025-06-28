@@ -166,6 +166,9 @@ const AdminProductList = () => {
 
   return (
     <div className="admin-product-list-container">
+         <button onClick={() => navigate(-1)} className="back-button">
+        &larr; Back
+      </button>
       <div className="admin-product-list-header">
         <h1>Product Management</h1>
         <button onClick={() => navigate('/admin/product/new')} className="admin-add-product-button">
@@ -303,6 +306,16 @@ const AdminProductList = () => {
                                       accept="image/*"
                                       onChange={(e) => handleFlavorImageUpload(e, index)}
                                     />
+                                    <span   className="admin-flavor-badge">
+                                   
+                                  {flavor.imagestring && (
+                                    <img
+                                      src={`data:image/jpeg;base64,${flavor.imagestring}`}
+                                      alt={flavor.flr}
+                                      className="admin-flavor-image"
+                                    />
+                                  )}
+                                </span>
                                     <button
                                       type="button"
                                       onClick={() => removeFlavor(index)}

@@ -1,68 +1,155 @@
-import React, { useContext, useState,useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navi.css';
 import { usecontext } from '../App';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaShoppingCart, FaCog } from 'react-icons/fa';
+import { MdAdminPanelSettings } from 'react-icons/md';
 
 const Navigation = () => {
   const { user, handleLogout } = useContext(usecontext);
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-   const [admin, setAdmin] = useState(false);
+  const [admin, setAdmin] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-    useEffect(() => {
-           // Check if IsAdmin equals 1 (number)
-           if (user?.IsAdmin == true) {
-               setAdmin(true);
-           } else {
-               setAdmin(false); // Explicitly set false if not admin
-           }
+  useEffect(() => {
+    if (user?.IsAdmin == true) {
+      setAdmin(true);
+    } else {
+      setAdmin(false);
+    }
+  }, [user]);
 
-           console.log(admin)
-       }, [user]);
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
+    };
+
+    document.addEventListener('scroll', handleScroll, { passive: true });
+    return () => document.removeEventListener('scroll', handleScroll);
+  }, [scrolled]);
 
   const handleLoginRedirect = () => {
     navigate('/login');
+    setIsMobileMenuOpen(false);
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+    document.body.style.overflow = isMobileMenuOpen ? 'auto' : 'hidden';
   };
 
-  
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    document.body.style.overflow = 'auto';
+  };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-brand">
-        <Link to="/">Exprez Vapes (UK)</Link>
-      </div>
-      
-      {/* Mobile menu button */}
-      <button className="mobile-menu-button" onClick={toggleMobileMenu}>
-        {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-      </button>
-      
-      {/* Navigation links - both desktop and mobile */}
-      <div className={`navbar-links-container ${isMobileMenuOpen ? 'active' : ''}`}>
-         
-        
-        {/* User section */}
-        <div className="user-section">
-          {user ? (
-            <>
-              <section>Welcome {user.username}</section>
-               
-              <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Logout</button>
-            </>
-          ) : (
-            <button onClick={() => { handleLoginRedirect(); setIsMobileMenuOpen(false); }}>Login</button>
-          )}
+    <>
+      <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+        <div className="navbar-container">
+          <div className="navbar-left">
+            <div className="navbar-brand">
+              <Link to="/" onClick={closeMobileMenu}>
+                <span className="logo-text">Exprez Vapes</span>
+                <span className="logo-subtext">UK</span>
+              </Link>
+            </div>
+            
+            <button 
+              className="mobile-menu-button" 
+              onClick={toggleMobileMenu}
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          </div>
 
-          {admin ? <> <button onClick={()=>{navigate('/admin/product')}}>Manage products</button></>:<>Not admin</>}
+          <div className="navbar-right">
+            {user && (
+              <Link to="/cart" className="cart-icon" aria-label="Shopping Cart">
+                <FaShoppingCart />
+                <span className="cart-count">0</span>
+              </Link>
+            )}
+          </div>
+
+          <div className={`navbar-links-container ${isMobileMenuOpen ? 'active' : ''}`}>
+            <button 
+              className="mobile-close-button" 
+              onClick={closeMobileMenu}
+              aria-label="Close menu"
+            >
+              <FaTimes />
+            </button>
+            
+            <div className="user-section">
+              {user ? (
+                <div className="user-info">
+                  <div className="user-greeting">
+                    <FaUser className="user-icon" />
+                    <span>Hello, {user.username}</span>
+                  </div>
+                  
+                  <div className="user-actions">
+                    {admin && (
+                      <button 
+                        className="admin-btn"
+                        onClick={() => {
+                          navigate('/admin/product');
+                          closeMobileMenu();
+                        }}
+                      >
+                        <MdAdminPanelSettings className="admin-icon" />
+                        Admin Panel
+                      </button>
+                    )}
+                    
+                    <button 
+                      className="logout-btn"
+                      onClick={() => {
+                        handleLogout();
+                        closeMobileMenu();
+                      }}
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="auth-actions">
+                  <button 
+                    className="login-btn"
+                    onClick={handleLoginRedirect}
+                  >
+                   Login
+                  </button>
+                  <button 
+                    className="register-btn"
+                    onClick={() => {
+                      navigate('/register');
+                      closeMobileMenu();
+                    }}
+                  >
+                    Register
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+      
+      {/* Overlay for mobile menu */}
+      <div 
+        className={`navbar-overlay ${isMobileMenuOpen ? 'active' : ''}`} 
+        onClick={closeMobileMenu}
+      />
+    </>
   );
 };
 
-export default Navigation;
+export default Navigation;  

@@ -1,123 +1,115 @@
-import   { useState } from 'react'
+import { useState, useEffect } from 'react';
 import authService from '../api/auth';
 import { useNavigate } from 'react-router-dom';
+import './LoginForm.css';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Create floating particles
+    const createParticles = () => {
+      const particlesContainer = document.createElement('div');
+      particlesContainer.className = 'login-particles';
+      
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        const size = Math.random() * 20 + 5;
+        const posX = Math.random() * 100;
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
+        
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.animationDuration = `${duration}s`;
+        particle.style.animationDelay = `${delay}s`;
+        
+        particlesContainer.appendChild(particle);
+      }
+      
+      document.querySelector('.login-container').appendChild(particlesContainer);
+    };
+    
+    createParticles();
+    
+    return () => {
+      const particles = document.querySelector('.login-particles');
+      if (particles) particles.remove();
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    setIsLoading(true);
+    
     try {
       await authService.login({ email, password });
-      setMessage('Login successful! Redirecting to home...');
+      setMessage('Login successful! Redirecting...');
       setTimeout(() => {
-        navigate('/'); // Redirect to home page or dashboard
-        window.location.reload(); // Force a reload to update UI state
+        navigate('/');
+        window.location.reload();
       }, 1500);
     } catch (error) {
-      setMessage(error.response?.data?.message || 'Something went wrong');
+      setMessage(error.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.header}>Login</h2>
-      {message && <p style={styles.message}>{message}</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.formGroup}>
-          <label htmlFor="email" style={styles.label}>Email:</label>
+    <div className="login-container">
+      <h2 className="login-header">Welcome Back</h2>
+      {message && (
+        <div className={`login-message ${message.includes('successful') ? 'success' : 'error'}`}>
+          {message}
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="login-form">
+        <div className="form-group">
           <input
             type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={styles.input}
+            className="form-input"
+            placeholder=" "
           />
+          <label htmlFor="email" className="form-label">Email Address</label>
         </div>
-        <div style={styles.formGroup}>
-          <label htmlFor="password" style={styles.label}>Password:</label>
+        <div className="form-group">
           <input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={styles.input}
+            className="form-input"
+            placeholder=" "
           />
+          <label htmlFor="password" className="form-label">Password</label>
         </div>
-        <button type="submit" style={styles.button}>Login</button>
+        <button 
+          type="submit" 
+          className={`login-button ${isLoading ? 'loading' : ''}`}
+          disabled={isLoading}
+        >
+          {isLoading ? '' : 'Sign In'}
+        </button>
       </form>
-      <p style={styles.linkText}>
-        Don't have an account? <a href="/signup" style={styles.link}>Sign up here</a>
+      <p className="login-link-text">
+        New user? <a href="/signup" className="login-link">Create an account</a>
       </p>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: '400px',
-    margin: '50px auto',
-    padding: '20px',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    backgroundColor: '#fff',
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '20px',
-    color: '#333',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  formGroup: {
-    marginBottom: '15px',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    fontWeight: 'bold',
-    color: '#555',
-  },
-  input: {
-    width: '100%',
-    padding: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    boxSizing: 'border-box',
-  },
-  button: {
-    padding: '10px 15px',
-    backgroundColor: '#28a745',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    marginTop: '10px',
-  },
-  message: {
-    textAlign: 'center',
-    color: 'red',
-    marginBottom: '15px',
-  },
-  linkText: {
-    textAlign: 'center',
-    marginTop: '20px',
-    color: '#666',
-  },
-  link: {
-    color: '#007bff',
-    textDecoration: 'none',
-  },
-};
 
 export default LoginForm;
