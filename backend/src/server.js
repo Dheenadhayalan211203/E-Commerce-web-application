@@ -16,7 +16,7 @@ connectDB();
 // CORS Configuration
 const corsOptions = {
   origin: 'http://localhost:5173',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
   optionsSuccessStatus: 200
@@ -153,6 +153,187 @@ app.get('/api/products/:id', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+ // Get All Products (Admin version with inactive products)
+app.get('/api/admin/products', async (req, res) => {
+  try {
+    const products = await Product.findAll();
+    
+    const responseData = products.map(product => {
+      const productData = product.toJSON();
+      try {
+        // Parse flavors_data if it exists
+        productData.flavors = productData.flavors_data ? 
+                             JSON.parse(productData.flavors_data).flavours || [] : 
+                             [];
+      } catch (e) {
+        console.error('Error parsing flavors_data in response:', e);
+        productData.flavors = [];
+      }
+       
+      return productData;
+    });
+
+    res.json(responseData);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get Single Product (Admin version)
+app.get('/api/admin/products/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    
+    if (!/^\d+$/.test(productId)) {
+      return res.status(400).json({ error: 'Invalid product ID format' });
+    }
+
+    const product = await Product.findByPk(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const responseData = product.toJSON();
+    try {
+      responseData.flavors = responseData.flavors_data ? 
+                           JSON.parse(responseData.flavors_data).flavours || [] : 
+                           [];
+    } catch (e) {
+      console.error('Error parsing flavors_data in response:', e);
+      responseData.flavors = [];
+    }
+    delete responseData.flavors_data;
+
+    res.json(responseData);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Update Product Endpoint
+app.put('/api/admin/products/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const updates = req.body;
+
+    // Validate required fields
+    if (!updates.name || !updates.brand || updates.price === undefined) {
+      return res.status(400).json({
+        error: 'Name, brand, and price are required fields'
+      });
+    }
+
+    // Find the product
+    const product = await Product.findByPk(productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    // Prepare update data
+    const updateData = {
+      name: updates.name,
+      brand: updates.brand,
+      flavors_data: updates.flavors_data || product.flavors_data,
+      nicotine_level: updates.nicotine_level || product.nicotine_level,
+      description: updates.description || product.description,
+      image_base64: updates.image_base64 || product.image_base64,
+      price: parseFloat(updates.price),
+      stock: parseInt(updates.stock) || product.stock,
+      category: updates.category || product.category,
+      product_group: updates.product_group || product.product_group,
+      is_active: updates.is_active !== undefined ? updates.is_active : product.is_active
+    };
+
+    // Update the product
+    await product.update(updateData);
+
+    // Format the response
+    const responseData = product.toJSON();
+    try {
+      responseData.flavors = responseData.flavors_data ? 
+                           JSON.parse(responseData.flavors_data).flavours || [] : 
+                           [];
+    } catch (e) {
+      console.error('Error parsing flavors_data in response:', e);
+      responseData.flavors = [];
+    }
+    delete responseData.flavors_data;
+
+    res.json({
+      message: 'Product updated successfully',
+      product: responseData
+    });
+
+  } catch (error) {
+    console.error('Error updating product:', error);
+    
+    let errorMessage = 'Failed to update product';
+    let errorDetails = '';
+    
+    if (error.name === 'SequelizeValidationError') {
+      errorMessage = 'Validation error';
+      errorDetails = error.errors.map(err => err.message).join(', ');
+    }
+
+    res.status(500).json({
+      error: `${errorMessage} ${errorDetails ? `- ${errorDetails}` : ''}`.trim()
+    });
+  }
+});
+
+// Delete Product Endpoint (soft delete)
+app.delete('/api/admin/products/:id', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    
+    // Soft delete (set is_active to false)
+    const result = await Product.update(
+      { is_active: false },
+      { where: { id: productId } }
+    );
+
+    if (result[0] === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Failed to delete product' });
+  }
+});
+
+// Toggle Product Status Endpoint
+app.patch('/api/admin/products/:id/status', async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { is_active } = req.body;
+
+    if (typeof is_active !== 'boolean') {
+      return res.status(400).json({ error: 'Invalid status value' });
+    }
+
+    const product = await Product.findByPk(productId);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    await product.update({ is_active });
+    res.json({ 
+      message: `Product ${is_active ? 'activated' : 'deactivated'} successfully`,
+      is_active
+    });
+  } catch (error) {
+    console.error('Error toggling product status:', error);
+    res.status(500).json({ error: 'Failed to update product status' });
+  }
+});
+
+ 
 
 // Start server
 app.listen(PORT, () => {

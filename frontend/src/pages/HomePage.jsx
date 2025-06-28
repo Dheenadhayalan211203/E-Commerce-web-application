@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react
 import ProductCard from '../components/Productcard';
 import './Homepage.css'
 import AdminProductForm from '../components/Adminprad';
+import AdminProductList from '../components/AdminProductList';
  
 
 /*const HomePage = ({ user, onLogout }) => {
@@ -50,7 +51,7 @@ const navigate = useNavigate();
     window.location.reload(); // Force reload to clear state
   };
 
-  console.log(user)
+  
 
   return (
      
@@ -64,6 +65,7 @@ const navigate = useNavigate();
                
                
          </div>
+         
           
        </div>
         

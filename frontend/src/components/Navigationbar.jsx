@@ -44,20 +44,7 @@ const Navigation = () => {
       
       {/* Navigation links - both desktop and mobile */}
       <div className={`navbar-links-container ${isMobileMenuOpen ? 'active' : ''}`}>
-        <ul className="navbar-links">
-          <li>
-            <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-          </li>
-          <li>
-            <Link to="/products" onClick={() => setIsMobileMenuOpen(false)}>Compliant Vapes</Link>
-          </li>
-          <li>
-            <Link to="/about" onClick={() => setIsMobileMenuOpen(false)}>Nicotine Salts</Link>
-          </li>
-          <li>
-            <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>Nicotine Pouches</Link>
-          </li>
-        </ul>
+         
         
         {/* User section */}
         <div className="user-section">

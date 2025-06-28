@@ -13,6 +13,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import Product from "./pages/Productdescription";
 import Adminproductadd from "./pages/Adminproductadd";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess";
+import CRUD from "./pages/AdminCRUD";
+import AdminProductForm from "./components/Adminprad";
 
 export const usecontext = createContext();
 
@@ -59,10 +61,20 @@ function App() {
             path="/admin/product"
             element={
               <AdminRoute>
-                <Adminproductadd />
+                <CRUD />
               </AdminRoute>
             }
           />
+
+          <Route path="/admin/product/new"
+          element={
+            <AdminRoute>
+              <AdminProductForm/>
+            </AdminRoute>
+          }>
+
+
+          </Route>
           {/* Add more routes for your e-commerce site */}
         </Routes>
       </Router>
