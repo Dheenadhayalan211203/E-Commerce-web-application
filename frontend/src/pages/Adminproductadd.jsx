@@ -1,28 +1,14 @@
 import { useContext, useState, useEffect } from 'react';
-import { usecontext } from "../App";
+import { usecontext } from "../App"; // Use the exact same name as exported
+import AdminProductForm from '../components/Adminprad';
 
 const AdminProductAdd = () => {
-    const { user, handleLogout } = useContext(usecontext);
-    const [admin, setAdmin] = useState(false);
+    const { user, handleLogout } = useContext(usecontext); // lowercase
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+ 
 
-    useEffect(() => {
-        // Check if IsAdmin equals 1 (number)
-        if (user?.IsAdmin === 1) {
-            setAdmin(true);
-        } else {
-            setAdmin(false); // Explicitly set false if not admin
-        }
-    }, [user]);
-
-    return (
-        <>
-            {admin ? (
-                <div>Admin Content Here</div>
-            ) : (
-                <div>Regular User Content</div>
-            )}
-        </>
-    );
+    return  <AdminProductForm /> 
 }
 
 export default AdminProductAdd;

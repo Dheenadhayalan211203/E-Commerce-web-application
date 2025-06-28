@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState,useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navi.css';
 import { usecontext } from '../App';
@@ -8,6 +8,18 @@ const Navigation = () => {
   const { user, handleLogout } = useContext(usecontext);
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+   const [admin, setAdmin] = useState(false);
+
+    useEffect(() => {
+           // Check if IsAdmin equals 1 (number)
+           if (user?.IsAdmin == true) {
+               setAdmin(true);
+           } else {
+               setAdmin(false); // Explicitly set false if not admin
+           }
+
+           console.log(admin)
+       }, [user]);
 
   const handleLoginRedirect = () => {
     navigate('/login');
@@ -16,6 +28,8 @@ const Navigation = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  
 
   return (
     <nav className="navbar">
@@ -50,11 +64,14 @@ const Navigation = () => {
           {user ? (
             <>
               <section>Welcome {user.username}</section>
+               
               <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>Logout</button>
             </>
           ) : (
             <button onClick={() => { handleLoginRedirect(); setIsMobileMenuOpen(false); }}>Login</button>
           )}
+
+          {admin ? <> <button onClick={()=>{navigate('/admin/product')}}>Manage products</button></>:<>Not admin</>}
         </div>
       </div>
     </nav>

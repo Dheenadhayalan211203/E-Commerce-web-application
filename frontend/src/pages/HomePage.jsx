@@ -64,7 +64,7 @@ const navigate = useNavigate();
                
                
          </div>
-         <AdminProductForm/>
+          
        </div>
         
      </>

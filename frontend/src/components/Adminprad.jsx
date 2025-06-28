@@ -257,6 +257,9 @@ const AdminProductForm = () => {
 
   return (
     <div className="admin-product-container">
+       <button onClick={() => navigate(-1)} className="back-button">
+        &larr; Back
+      </button>
       <h1 className="admin-product-header">Add New Product</h1>
       
       {errors.global && <div className="admin-status-message error-message">{errors.global}</div>}
@@ -509,8 +512,13 @@ const AdminProductForm = () => {
             ) : (
               'Create Product'
             )}
+
+            
           </button>
+            
         </div>
+        {errors.global && <div className="admin-status-message error-message">{errors.global}</div>}
+      {success && <div className="admin-status-message success-message">{success}</div>}
       </form>
     </div>
   );
