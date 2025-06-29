@@ -85,6 +85,33 @@ const AdminProductList = () => {
     }));
   };
 
+  const handleMainImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check if file is an image
+    if (!file.type.match('image.*')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image size should be less than 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result.split(',')[1];
+      setEditingProduct(prev => ({
+        ...prev,
+        image_base64: base64String
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleFlavorChange = (index, field, value) => {
     setEditingProduct(prev => {
       const updatedFlavors = [...prev.flavors_data.flavours];
@@ -101,6 +128,18 @@ const AdminProductList = () => {
   const handleFlavorImageUpload = (e, index) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Check if file is an image
+    if (!file.type.match('image.*')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    // Check file size (max 1MB)
+    if (file.size > 1 * 1024 * 1024) {
+      setError('Flavor image size should be less than 1MB');
+      return;
+    }
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -166,258 +205,366 @@ const AdminProductList = () => {
 
   return (
     <div className="admin-product-list-container">
-         <button onClick={() => navigate(-1)} className="back-button">
-        &larr; Back
+      <button onClick={() => navigate(-1)} className="admin-back-button">
+        <i className="fas fa-arrow-left"></i> Back to Dashboard
       </button>
+      
       <div className="admin-product-list-header">
-        <h1>Product Management</h1>
-        <button onClick={() => navigate('/admin/product/new')} className="admin-add-product-button">
-          Add New Product
+        <h1><i className="fas fa-cubes"></i> Product Management</h1>
+        <button 
+          onClick={() => navigate('/admin/product/new')} 
+          className="admin-add-product-button"
+        >
+          <i className="fas fa-plus"></i> Add New Product
         </button>
       </div>
 
-      {error && <div className="admin-error-message">{error}</div>}
-      {success && <div className="admin-success-message">{success}</div>}
+      {error && (
+        <div className="admin-message admin-error-message">
+          <i className="fas fa-exclamation-circle"></i> {error}
+        </div>
+      )}
+      {success && (
+        <div className="admin-message admin-success-message">
+          <i className="fas fa-check-circle"></i> {success}
+        </div>
+      )}
 
       {loading && !products.length ? (
-        <div className="admin-loading">Loading products...</div>
+        <div className="admin-loading">
+          <div className="admin-spinner"></div>
+          Loading products...
+        </div>
       ) : (
         <div className="admin-product-list">
           {products.length === 0 ? (
-            <div className="admin-no-products">No products found</div>
+            <div className="admin-no-products">
+              <i className="fas fa-box-open"></i>
+              <p>No products found</p>
+              <button 
+                onClick={() => navigate('/admin/product/new')} 
+                className="admin-add-product-button"
+              >
+                <i className="fas fa-plus"></i> Create Your First Product
+              </button>
+            </div>
           ) : (
-            <table className="admin-product-table">
-              <thead>
-                <tr>
-                  <th>Image</th>
-                  <th>Name</th>
-                  <th>Brand</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>Flavors</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map(product => (
-                  <React.Fragment key={product.id}>
-                    {editingProduct?.id === product.id ? (
-                      <tr className="admin-edit-form-row">
-                        <td colSpan="8">
-                          <form onSubmit={handleEditSubmit} className="admin-edit-form">
-                            <div className="admin-edit-form-grid">
-                              <div className="admin-edit-form-group">
-                                <label>Name</label>
-                                <input
-                                  type="text"
-                                  name="name"
-                                  value={editingProduct.name}
-                                  onChange={handleEditChange}
-                                  required
-                                />
-                              </div>
-                              <div className="admin-edit-form-group">
-                                <label>Brand</label>
-                                <input
-                                  type="text"
-                                  name="brand"
-                                  value={editingProduct.brand}
-                                  onChange={handleEditChange}
-                                  required
-                                />
-                              </div>
-                              <div className="admin-edit-form-group">
-                                <label>Price</label>
-                                <input
-                                  type="number"
-                                  name="price"
-                                  value={editingProduct.price}
-                                  onChange={handleEditChange}
-                                  min="0.01"
-                                  step="0.01"
-                                  required
-                                />
-                              </div>
-                              <div className="admin-edit-form-group">
-                                <label>Stock</label>
-                                <input
-                                  type="number"
-                                  name="stock"
-                                  value={editingProduct.stock}
-                                  onChange={handleEditChange}
-                                  min="0"
-                                />
-                              </div>
-                              <div className="admin-edit-form-group">
-                                <label>Nicotine Level</label>
-                                <select
-                                  name="nicotine_level"
-                                  value={editingProduct.nicotine_level || ''}
-                                  onChange={handleEditChange}
-                                >
-                                  <option value="">Select</option>
-                                  <option value="low">Low</option>
-                                  <option value="medium">Medium</option>
-                                  <option value="high">High</option>
-                                </select>
-                              </div>
-                              <div className="admin-edit-form-group">
-                                <label>Category</label>
-                                <input
-                                  type="text"
-                                  name="category"
-                                  value={editingProduct.category || ''}
-                                  onChange={handleEditChange}
-                                />
-                              </div>
-                              <div className="admin-edit-form-group">
-                                <label>Product Group</label>
-                                <input
-                                  type="text"
-                                  name="product_group"
-                                  value={editingProduct.product_group || ''}
-                                  onChange={handleEditChange}
-                                />
-                              </div>
-                              <div className="admin-edit-form-group">
-                                <label>Description</label>
-                                <textarea
-                                  name="description"
-                                  value={editingProduct.description || ''}
-                                  onChange={handleEditChange}
-                                  rows="3"
-                                />
-                              </div>
-
-                              <div className="admin-flavors-edit-section">
-                                <h4>Flavors</h4>
-                                {editingProduct.flavors_data.flavours.map((flavor, index) => (
-                                  <div key={index} className="admin-flavor-edit-item">
-                                    <input
-                                      type="text"
-                                      value={flavor.flr}
-                                      onChange={(e) => handleFlavorChange(index, 'flr', e.target.value)}
-                                      placeholder="Flavor name"
-                                      required
-                                    />
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      onChange={(e) => handleFlavorImageUpload(e, index)}
-                                    />
-                                    <span   className="admin-flavor-badge">
-                                   
-                                  {flavor.imagestring && (
-                                    <img
-                                      src={`data:image/jpeg;base64,${flavor.imagestring}`}
-                                      alt={flavor.flr}
-                                      className="admin-flavor-image"
-                                    />
-                                  )}
-                                </span>
-                                    <button
-                                      type="button"
-                                      onClick={() => removeFlavor(index)}
-                                      className="admin-remove-flavor-button"
-                                    >
-                                      Remove
-                                    </button>
+            <div className="admin-product-table-container">
+              <table className="admin-product-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Brand</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Flavors</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map(product => (
+                    <React.Fragment key={product.id}>
+                      {editingProduct?.id === product.id ? (
+                        <tr className="admin-edit-form-row">
+                          <td colSpan="8">
+                            <form onSubmit={handleEditSubmit} className="admin-edit-form">
+                              <div className="admin-edit-form-grid">
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-image"></i> Main Product Image
+                                  </label>
+                                  <div className="admin-image-upload-container">
+                                    <label className="admin-image-upload-label">
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleMainImageUpload}
+                                        className="admin-image-upload-input"
+                                      />
+                                      <span className="admin-image-upload-button">
+                                        <i className="fas fa-cloud-upload-alt"></i> Choose Image
+                                      </span>
+                                    </label>
+                                    {editingProduct.image_base64 && (
+                                      <div className="admin-current-image-container">
+                                        <img
+                                          src={`data:image/jpeg;base64,${editingProduct.image_base64}`}
+                                          alt="Current product"
+                                          className="admin-current-image-preview"
+                                        />
+                                        <button
+                                          type="button"
+                                          onClick={() => setEditingProduct(prev => ({
+                                            ...prev,
+                                            image_base64: null
+                                          }))}
+                                          className="admin-remove-image-button"
+                                        >
+                                          <i className="fas fa-times"></i>
+                                        </button>
+                                      </div>
+                                    )}
                                   </div>
-                                ))}
-                                <button
-                                  type="button"
-                                  onClick={addFlavor}
-                                  className="admin-add-flavor-button"
-                                >
-                                  Add Flavor
-                                </button>
-                              </div>
+                                </div>
 
-                              <div className="admin-edit-form-buttons">
-                                <button type="submit" className="admin-save-button">
-                                  Save
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={cancelEditing}
-                                  className="admin-cancel-button"
-                                >
-                                  Cancel
-                                </button>
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-tag"></i> Name
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="name"
+                                    value={editingProduct.name}
+                                    onChange={handleEditChange}
+                                    required
+                                  />
+                                </div>
+
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-building"></i> Brand
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="brand"
+                                    value={editingProduct.brand}
+                                    onChange={handleEditChange}
+                                    required
+                                  />
+                                </div>
+
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-dollar-sign"></i> Price
+                                  </label>
+                                  <input
+                                    type="number"
+                                    name="price"
+                                    value={editingProduct.price}
+                                    onChange={handleEditChange}
+                                    min="0.01"
+                                    step="0.01"
+                                    required
+                                  />
+                                </div>
+
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-boxes"></i> Stock
+                                  </label>
+                                  <input
+                                    type="number"
+                                    name="stock"
+                                    value={editingProduct.stock}
+                                    onChange={handleEditChange}
+                                    min="0"
+                                  />
+                                </div>
+
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-smoking"></i> Nicotine Level
+                                  </label>
+                                  <select
+                                    name="nicotine_level"
+                                    value={editingProduct.nicotine_level || ''}
+                                    onChange={handleEditChange}
+                                  >
+                                    <option value="">Select</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                  </select>
+                                </div>
+
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-list"></i> Category
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="category"
+                                    value={editingProduct.category || ''}
+                                    onChange={handleEditChange}
+                                  />
+                                </div>
+
+                                <div className="admin-edit-form-group">
+                                  <label>
+                                    <i className="fas fa-layer-group"></i> Product Group
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="product_group"
+                                    value={editingProduct.product_group || ''}
+                                    onChange={handleEditChange}
+                                  />
+                                </div>
+
+                                <div className="admin-edit-form-group admin-full-width">
+                                  <label>
+                                    <i className="fas fa-align-left"></i> Description
+                                  </label>
+                                  <textarea
+                                    name="description"
+                                    value={editingProduct.description || ''}
+                                    onChange={handleEditChange}
+                                    rows="4"
+                                  />
+                                </div>
+
+                                <div className="admin-flavors-edit-section admin-full-width">
+                                  <h4>
+                                    <i className="fas fa-ice-cream"></i> Flavors
+                                  </h4>
+                                  {editingProduct.flavors_data.flavours.map((flavor, index) => (
+                                    <div key={index} className="admin-flavor-edit-item">
+                                      <input
+                                        type="text"
+                                        value={flavor.flr}
+                                        onChange={(e) => handleFlavorChange(index, 'flr', e.target.value)}
+                                        placeholder="Flavor name"
+                                        required
+                                      />
+                                      <label className="admin-image-upload-label">
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={(e) => handleFlavorImageUpload(e, index)}
+                                          className="admin-image-upload-input"
+                                        />
+                                        <span className="admin-image-upload-button">
+                                          {flavor.imagestring ? 'Change Image' : 'Add Image'}
+                                        </span>
+                                      </label>
+                                      {flavor.imagestring && (
+                                        <div className="admin-current-image-container">
+                                          <img
+                                            src={`data:image/jpeg;base64,${flavor.imagestring}`}
+                                            alt={flavor.flr}
+                                            className="admin-flavor-image-preview"
+                                          />
+                                        </div>
+                                      )}
+                                      <button
+                                        type="button"
+                                        onClick={() => removeFlavor(index)}
+                                        className="admin-remove-flavor-button"
+                                      >
+                                        <i className="fas fa-trash"></i>
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <button
+                                    type="button"
+                                    onClick={addFlavor}
+                                    className="admin-add-flavor-button"
+                                  >
+                                    <i className="fas fa-plus"></i> Add Flavor
+                                  </button>
+                                </div>
+
+                                <div className="admin-edit-form-buttons admin-full-width">
+                                  <button type="submit" className="admin-save-button">
+                                    <i className="fas fa-save"></i> Save Changes
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={cancelEditing}
+                                    className="admin-cancel-button"
+                                  >
+                                    <i className="fas fa-times"></i> Cancel
+                                  </button>
+                                </div>
                               </div>
+                            </form>
+                          </td>
+                        </tr>
+                      ) : (
+                        <tr>
+                          <td>
+                            {product.image_base64 && (
+                              <div className="admin-product-image-container">
+                                <img
+                                  src={`data:image/jpeg;base64,${product.image_base64}`}
+                                  alt={product.name}
+                                  className="admin-product-thumbnail"
+                                />
+                              </div>
+                            )}
+                          </td>
+                          <td>{product.name}</td>
+                          <td>{product.brand}</td>
+                          <td>${product.price }</td>
+                          <td>{product.stock}</td>
+                          <td>
+                            {product.flavors_data?.flavours?.length > 0 ? (
+                              <div className="admin-flavor-badges">
+                                {product.flavors_data.flavours.map((flavor, i) => (
+                                  <span key={i} className="admin-flavor-badge">
+                                    {flavor.flr}
+                                    {flavor.imagestring && (
+                                      <img
+                                        src={`data:image/jpeg;base64,${flavor.imagestring}`}
+                                        alt={flavor.flr}
+                                        className="admin-flavor-image"
+                                      />
+                                    )}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              'No flavors'
+                            )}
+                          </td>
+                          <td>
+                            <span className={`admin-status-badge ${product.is_active ? 'active' : 'inactive'}`}>
+                              {product.is_active ? (
+                                <>
+                                  <i className="fas fa-check-circle"></i> Active
+                                </>
+                              ) : (
+                                <>
+                                  <i className="fas fa-times-circle"></i> Inactive
+                                </>
+                              )}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="admin-action-buttons">
+                              <button
+                                onClick={() => startEditing(product)}
+                                className="admin-edit-button"
+                              >
+                                <i className="fas fa-edit"></i> Edit
+                              </button>
+                              <button
+                                onClick={() => handleDelete(product.id)}
+                                className="admin-delete-button"
+                              >
+                                <i className="fas fa-trash"></i> Delete
+                              </button>
+                              <button
+                                onClick={() => toggleProductStatus(product.id, product.is_active)}
+                                className={`admin-status-button ${product.is_active ? 'deactivate' : 'activate'}`}
+                              >
+                                {product.is_active ? (
+                                  <><i className="fas fa-toggle-off"></i> Deactivate</>
+                                ) : (
+                                  <><i className="fas fa-toggle-on"></i> Activate</>
+                                )}
+                              </button>
                             </div>
-                          </form>
-                        </td>
-                      </tr>
-                    ) : (
-                      <tr>
-                        <td>
-                          {product.image_base64 && (
-                            <img
-                              src={`data:image/jpeg;base64,${product.image_base64}`}
-                              alt={product.name}
-                              className="admin-product-thumbnail"
-                            />
-                          )}
-                        </td>
-                        <td>{product.name}</td>
-                        <td>{product.brand}</td>
-                        <td>${product.price}</td>
-                        <td>{product.stock}</td>
-                        <td>
-                          {product.flavors_data?.flavours?.length > 0 ? (
-                            <div className="admin-flavor-badges">
-                              {product.flavors_data.flavours.map((flavor, i) => (
-                                <span key={i} className="admin-flavor-badge">
-                                  {flavor.flr}
-                                  {flavor.imagestring && (
-                                    <img
-                                      src={`data:image/jpeg;base64,${flavor.imagestring}`}
-                                      alt={flavor.flr}
-                                      className="admin-flavor-image"
-                                    />
-                                  )}
-                                </span>
-                              ))}
-                            </div>
-                          ) : (
-                            'No flavors'
-                          )}
-                        </td>
-                        <td>
-                          <span className={`admin-status-badge ${product.is_active ? 'active' : 'inactive'}`}>
-                            {product.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="admin-action-buttons">
-                            <button
-                              onClick={() => startEditing(product)}
-                              className="admin-edit-button"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(product.id)}
-                              className="admin-delete-button"
-                            >
-                              Delete
-                            </button>
-                            <button
-                              onClick={() => toggleProductStatus(product.id, product.is_active)}
-                              className={`admin-status-button ${product.is_active ? 'deactivate' : 'activate'}`}
-                            >
-                              {product.is_active ? 'Deactivate' : 'Activate'}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
