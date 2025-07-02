@@ -130,7 +130,7 @@ const Navigation = () => {
                   <button 
                     className="register-btn"
                     onClick={() => {
-                      navigate('/register');
+                      navigate('/signup');
                       closeMobileMenu();
                     }}
                   >

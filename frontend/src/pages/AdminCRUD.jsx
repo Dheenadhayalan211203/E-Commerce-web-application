@@ -1,8 +1,13 @@
 import AdminProductList from "../components/AdminProductList"
+import CategoryManagement from '../components/CategoryManagement';
+ 
+
 
 const CRUD =()=>{
     
-    return <AdminProductList/>
+    return <><AdminProductList/>
+      <CategoryManagement/>
+    </>
           
          
      

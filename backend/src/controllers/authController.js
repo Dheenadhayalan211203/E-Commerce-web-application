@@ -5,6 +5,9 @@ const { jwtSecret, jwtExpiresIn } = require('../config/jwt');
 const { sendOtpEmail } = require('../config/email'); // Import email sender
 const bcrypt = require('bcryptjs'); // Needed for password hashing if user is created here
 
+const role="user";
+const IsAdmin=0;
+
 const generateToken = (id) => {
   return jwt.sign({ id }, jwtSecret, {
     expiresIn: jwtExpiresIn,
@@ -41,7 +44,7 @@ exports.signupRequestOtp = async (req, res) => {
       otp,
       expiresAt,
       // Store temp user data (username, hashedPassword) to retrieve later
-      tempUserData: JSON.stringify({ username, password: hashedPassword })
+      tempUserData: JSON.stringify({ username, password: hashedPassword , role , IsAdmin })
     });
 
     await sendOtpEmail(email, otp);
@@ -75,9 +78,9 @@ exports.verifyOtp = async (req, res) => {
 
     // OTP is valid and not expired, proceed to create user
     const tempUserData = JSON.parse(otpRecord.tempUserData);
-    const { username, password } = tempUserData; // Password is already hashed
+    const { username, password , role , IsAdmin} = tempUserData; // Password is already hashed
 
-    const user = await User.create({ username, email, password });
+    const user = await User.create({ username, email, password , role , IsAdmin });
 
     // Delete the used OTP record
     await otpRecord.destroy();
