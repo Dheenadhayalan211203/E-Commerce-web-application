@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './CategoryManagement.css';
+import { useNavigate } from 'react-router-dom';
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -14,6 +15,8 @@ const CategoryManagement = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+
+  const navigate=useNavigate()
 
   // Show notification
   const showNotification = (message, type = 'success') => {
@@ -113,6 +116,9 @@ const CategoryManagement = () => {
 
   return (
     <div className="category-management">
+      <button onClick={() => navigate(-1)} className="back-button">
+        &larr; Back
+      </button>
       {/* Notification */}
       {notification.show && (
         <div className={`notification ${notification.type}`}>

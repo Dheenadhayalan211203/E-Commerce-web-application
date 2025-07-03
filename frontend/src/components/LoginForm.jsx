@@ -50,6 +50,7 @@ function LoginForm() {
     setMessage('');
     setIsLoading(true);
     
+    
     try {
       await authService.login({ email, password });
       setMessage('Login successful! Redirecting...');

@@ -15,6 +15,8 @@ import Adminproductadd from "./pages/Adminproductadd";
 import UnauthorizedAccess from "./pages/UnauthorizedAccess";
 import CRUD from "./pages/AdminCRUD";
 import AdminProductForm from "./components/Adminprad";
+import CategoryCRUD from "./pages/Admincategoryadd";
+import CartComponent from "./components/CartComponent";
 
 export const usecontext = createContext();
 
@@ -57,6 +59,7 @@ function App() {
             <Route path="/notfound" element={<NotFoundPage />} />
             <Route path="/unauthoraised" element={<UnauthorizedAccess />} />
             <Route path="*" element={<NotFoundPage />} />
+            <Route path="/cart" element={<CartComponent />} />
           
           <Route
             path="/admin/product"
@@ -67,12 +70,25 @@ function App() {
             }
           />
 
+          <Route
+            path="/admin/product/category"
+            element={
+              <AdminRoute>
+                  <CategoryCRUD/>
+              </AdminRoute>
+            }
+          />
+
           <Route path="/admin/product/new"
           element={
             <AdminRoute>
               <AdminProductForm/>
             </AdminRoute>
+
+            
           }>
+
+             
 
 
           </Route>

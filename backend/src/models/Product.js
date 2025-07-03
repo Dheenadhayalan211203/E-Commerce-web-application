@@ -188,11 +188,4 @@ Product.prototype.toggleActive = async function() {
   return await this.save();
 };
 
-Product.associate = function(models) {
-  Product.hasMany(models.Cart, {
-    foreignKey: 'product_id',  // Links to Cart's product_id
-    as: 'cartItems'           // Optional alias for queries
-  });
-};
-
 module.exports = Product;

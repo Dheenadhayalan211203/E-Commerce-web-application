@@ -117,6 +117,31 @@
   background: linear-gradient(135deg, var(--primary-dark), var(--primary));
 }
 
+/*Add category button */
+
+
+.admin-add-category-button {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(207, 164, 120, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-add-category-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+}
+
 /* Messages */
 .admin-message {
   padding: 1rem 1.5rem;
@@ -745,5 +770,112 @@
   .admin-flavor-badge {
     padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
+  }
+}
+
+
+/* Modal Styles */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.admin-modal-content {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+}
+
+.admin-modal-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: var(--gray-light);
+  color: var(--gray);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1.1rem;
+}
+
+.admin-modal-close:hover {
+  background: var(--danger);
+  color: var(--white);
+  transform: rotate(90deg);
+}
+
+.admin-modal-header {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--dark);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-modal-header i {
+  color: var(--primary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive Modal Adjustments */
+@media (max-width: 992px) {
+  .admin-modal-content {
+    width: 95%;
+    padding: 1.5rem;
+  }
+  
+  .admin-modal-header {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-modal-content {
+    width: 98%;
+    max-height: 95vh;
+    padding: 1.25rem;
+  }
+  
+  .admin-modal-header {
+    font-size: 1.3rem;
+  }
+  
+  .admin-edit-form-grid {
+    grid-template-columns: 1fr !important;
   }
 }

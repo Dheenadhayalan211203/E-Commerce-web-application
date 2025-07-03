@@ -12,6 +12,9 @@ import ProductCard from "../components/Productcard";
 import "./Homepage.css";
 import AdminProductForm from "../components/Adminprad";
 import AdminProductList from "../components/AdminProductList";
+import Catnav from "../components/Catnav";
+import CartComponent from "../components/CartComponent";
+
 
 /*const HomePage = ({ user, onLogout }) => {
     return (
@@ -59,10 +62,11 @@ const HomePage = () => {
         <div className="navi">
           <Navigation />
         </div>
-
+        <Catnav />
         <div className="pr">
           <ProductCard />
         </div>
+         <CartComponent/>
       </div>
     </>
   );

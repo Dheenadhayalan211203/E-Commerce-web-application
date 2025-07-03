@@ -1,54 +1,62 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require("../config/db");
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const Cart = sequelize.define(
-  "Cart",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-    product_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    quantity: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1,
-      validate: {
-        min: 1,
-      },
-    },
+const Cart = sequelize.define('Cart', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
-  {
-    tableName: "cart",
-    timestamps: true,
-    underscored: true,
+  productid: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  userid: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isEmail: true
+    }
+  },
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+    validate: {
+      min: 1
+    }
+  },
+  flavour: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   }
-);
-
-Cart.associate = function(models) {
-  // Each Cart item belongs to a Product
-  Cart.belongsTo(models.Product, {
-    foreignKey: 'product_id',  // References Product.id
-    as: 'product'             // Optional alias for queries
-  });
-
-  // Each Cart item belongs to a User (if needed)
-  Cart.belongsTo(models.User, {
-    foreignKey: 'user_id',    // References User.id
-    as: 'user'                // Optional alias for queries
-  });
-};
+}, {
+  tableName: 'cart',
+  timestamps: false,
+  hooks: {
+    beforeUpdate: (cart) => {
+      cart.updated_at = new Date();
+    }
+  },
+  indexes: [
+    {
+      unique: true,
+      fields: ['userid', 'productid', 'flavour'],
+      name: 'unique_cart_item'
+    }
+  ]
+});
 
 module.exports = Cart;

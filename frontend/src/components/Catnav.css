@@ -1,0 +1,120 @@
+/* Catnav.css - Perfectly Centered Text with Horizontal Scroll */
+
+ .category-nav-container {
+  position: static;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #f5f9ff;
+background: linear-gradient(to right, #f5f9ff, #f0f7ff);
+  width: 100%;
+  height: 60px;
+  overflow: hidden;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05); /* Softer shadow */
+  margin-bottom: 50px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Subtle bottom border */
+  padding: 10px;
+}
+
+.category-navbar {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 calc(50% - 400px); /* Centers content when wide enough */
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  align-items: center;
+  align-content: center;
+    
+}
+
+.category-navbar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: #555;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0 24px;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* Centered text container */
+.category-text {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+}
+
+/* Hover and Active States */
+.category-btn:hover .category-text {
+  color: #222;
+  transform: translateY(-1px);
+}
+
+.category-btn.active .category-text {
+  color: white;
+  font-weight: 600;
+}
+
+/* Underline Animation */
+.hover-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.category-btn:hover .hover-effect {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Active state styling */
+.category-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.category-btn.active .hover-effect {
+  display: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+  .category-navbar {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-btn {
+    padding: 0 16px;
+    font-size: 0.85rem;
+  }
+  
+  .category-nav-container {
+    height: 50px;
+  }
+}

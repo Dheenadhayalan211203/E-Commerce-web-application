@@ -47,6 +47,8 @@ const Navigation = () => {
     document.body.style.overflow = 'auto';
   };
 
+  console.log(user)
+
   return (
     <>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
@@ -72,7 +74,7 @@ const Navigation = () => {
             {user && (
               <Link to="/cart" className="cart-icon" aria-label="Shopping Cart">
                 <FaShoppingCart />
-                <span className="cart-count">0</span>
+                <span className="cart-count"></span>
               </Link>
             )}
           </div>

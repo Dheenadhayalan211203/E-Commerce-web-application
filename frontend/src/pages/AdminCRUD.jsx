@@ -6,7 +6,7 @@ import CategoryManagement from '../components/CategoryManagement';
 const CRUD =()=>{
     
     return <><AdminProductList/>
-      <CategoryManagement/>
+       
     </>
           
          
