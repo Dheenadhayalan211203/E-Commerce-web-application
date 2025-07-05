@@ -53,13 +53,13 @@ const ProductCard = () => {
           <div className="product-details">
             <span className="product-category">{product.category || 'Uncategorized'}</span>
             <h4>{product.name}</h4>
-            <p>{product.description || 'No description available'}</p>
+             
             <div className="product-bottom-details">
               <div className="product-price">
-                ${product.price}
+                £{ Number(product.price).toFixed(2)}
               </div>
               <div className="product-stock">
-                {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                {product.stock > 0 ? `${ ((product.stock)<999)? product.stock :"999+"} in stock` : 'Out of stock'}
               </div>
               <div className="product-links">
                 <button 

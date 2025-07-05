@@ -56,7 +56,7 @@ const Navigation = () => {
           <div className="navbar-left">
             <div className="navbar-brand">
               <Link to="/" onClick={closeMobileMenu}>
-                <span className="logo-text">Exprez Vapes</span>
+                <span className="logo-text">Exprz Vapes</span>
                 <span className="logo-subtext">UK</span>
               </Link>
             </div>

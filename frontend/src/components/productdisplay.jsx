@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { usecontext } from "../App";
 import axios from "axios";
-import "./Productdisplay.css";
+import "./ProductDisplay.css";
 
-const Productdisplay = () => {
+const ProductDisplay = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useContext(usecontext);
@@ -51,15 +51,6 @@ const Productdisplay = () => {
     fetchProduct();
   }, [id]);
 
-  const handleFlavorChange = (e) => {
-    const selectedName = e.target.value;
-    const flavor = flavors.find((f) => f.flr === selectedName);
-    setSelectedFlavor(flavor);
-    if (flavor?.imagestring) {
-      setMainImage(`data:image/jpeg;base64,${flavor.imagestring}`);
-    }
-  };
-
   const increaseQuantity = () => {
     if (product.stock > quantity) {
       setQuantity(quantity + 1);
@@ -85,30 +76,29 @@ const Productdisplay = () => {
 
   const handleAddToCart = async () => {
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/cart', {
+      const response = await axios.post("http://localhost:5000/api/cart", {
         productid: product.id,
         userid: user.id,
         email: user.email,
         quantity: quantity,
-        flavour: selectedFlavor ? selectedFlavor.flr : null
+        flavour: selectedFlavor ? selectedFlavor.flr : null,
       });
-      
+
       if (response.status === 201) {
         setShowSuccessPopup(true);
         setCartError(null);
-        // Hide the popup after 3 seconds
         setTimeout(() => setShowSuccessPopup(false), 3000);
       } else {
-        setCartError('Failed to add item to cart');
+        setCartError("Failed to add item to cart");
       }
     } catch (err) {
-      console.error('Error adding to cart:', err);
-      setCartError(err.response?.data?.error || 'Failed to add item to cart');
+      console.error("Error adding to cart:", err);
+      setCartError(err.response?.data?.error || "Failed to add item to cart");
     }
   };
 
@@ -150,29 +140,53 @@ const Productdisplay = () => {
             <div className="product-brand">Brand: {product.brand}</div>
           )}
 
+          {/* Stunning Flavor Selection */}
           {flavors.length > 0 && (
             <div className="flavor-selection">
-              <h3>Select Flavor:</h3>
-              <select
-                onChange={handleFlavorChange}
-                value={selectedFlavor?.flr || ""}
-              >
+              <h3>Choose Your Flavor</h3>
+              <div className="flavor-options">
                 {flavors.map((flavor, idx) => (
-                  <option key={idx} value={flavor.flr}>
-                    {flavor.flr}
-                  </option>
+                  <div 
+                    key={idx}
+                    className={`flavor-card ${selectedFlavor?.flr === flavor.flr ? 'active' : ''}`}
+                    onClick={() => {
+                      setSelectedFlavor(flavor);
+                      if (flavor?.imagestring) {
+                        setMainImage(`data:image/jpeg;base64,${flavor.imagestring}`);
+                      }
+                    }}
+                  >
+                    {flavor.imagestring ? (
+                      <>
+                        <img 
+                          src={`data:image/jpeg;base64,${flavor.imagestring}`} 
+                          alt={flavor.flr}
+                          className="flavor-image"
+                        />
+                        <div className="flavor-overlay">{flavor.flr}</div>
+                        <div className="flavor-checkmark"></div>
+                      </>
+                    ) : (
+                      <div className="flavor-text-only">{flavor.flr}</div>
+                    )}
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
           )}
 
           <div className="price-section">
-            <div className="product-price">Price: ${product.price}</div>
+            <div className="product-price">£ {(Number(product.price)).toFixed(2)}</div>
             <div className="quantity-selector">
-              <button onClick={decreaseQuantity} disabled={quantity <= 1}>
+              <button
+                className="quantity-btn decrement"
+                onClick={decreaseQuantity}
+                disabled={quantity <= 1}
+              >
                 -
               </button>
               <input
+                className="quantity-input"
                 type="number"
                 min="1"
                 max={product.stock}
@@ -180,15 +194,14 @@ const Productdisplay = () => {
                 onChange={handleQuantityChange}
               />
               <button
+                className="quantity-btn increment"
                 onClick={increaseQuantity}
                 disabled={quantity >= product.stock}
               >
                 +
               </button>
             </div>
-            <div className="total-price">
-              Total: ${calculateTotalPrice()}
-            </div>
+            <div className="total-price">Total: <span>£ {calculateTotalPrice()}</span></div>
           </div>
 
           <div
@@ -196,12 +209,20 @@ const Productdisplay = () => {
               product.stock > 0 ? "in-stock" : "out-of-stock"
             }`}
           >
-            {product.stock > 0 ? `${product.stock} in stock` : "Out of stock"}
+            {product.stock > 0 ? (
+              <>
+                <span className="stock-icon">✓</span> {product.stock} in stock
+              </>
+            ) : (
+              <>
+                <span className="stock-icon">✗</span> Out of stock
+              </>
+            )}
           </div>
 
           {product.nicotine_level && (
             <div className="nicotine-level">
-              Nicotine Level: {product.nicotine_level}
+              <span className="nicotine-icon">⚠</span> Nicotine Level: {product.nicotine_level}
             </div>
           )}
 
@@ -232,10 +253,10 @@ const Productdisplay = () => {
 
           <div className="product-meta">
             <div className="product-category">
-              Category: {product.category || "Uncategorized"}
+              <span className="meta-icon">🗂</span> Category: {product.category || "Uncategorized"}
             </div>
             <div className="product-status">
-              Status: {product.is_active ? "Active" : "Inactive"}
+              <span className="meta-icon">⦿</span> Status: {product.is_active ? "Active" : "Inactive"}
             </div>
           </div>
         </div>
@@ -244,4 +265,4 @@ const Productdisplay = () => {
   );
 };
 
-export default Productdisplay;
+export default ProductDisplay;

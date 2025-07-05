@@ -17,6 +17,7 @@ import CRUD from "./pages/AdminCRUD";
 import AdminProductForm from "./components/Adminprad";
 import CategoryCRUD from "./pages/Admincategoryadd";
 import CartComponent from "./components/CartComponent";
+import PaymentPage from "./components/PaymentPage";
 
 export const usecontext = createContext();
 
@@ -49,7 +50,7 @@ function App() {
   };
 
   return (
-    <usecontext.Provider value={{ user, handleLogout }}>
+    <usecontext.Provider value={{ user ,handleLogout }}>
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -60,7 +61,8 @@ function App() {
             <Route path="/unauthoraised" element={<UnauthorizedAccess />} />
             <Route path="*" element={<NotFoundPage />} />
             <Route path="/cart" element={<CartComponent />} />
-          
+             
+          <Route path="/checkout" element={<PaymentPage />} />
           <Route
             path="/admin/product"
             element={

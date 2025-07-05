@@ -30,7 +30,7 @@ const AdminProductForm = () => {
     global: "",
   });
 
-  const[categories,setCategories]=useState([])
+  const [categories, setCategories] = useState([]);
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [newFlavor, setNewFlavor] = useState({
@@ -255,7 +255,7 @@ const AdminProductForm = () => {
       );
 
       setSuccess("Product created successfully!");
-      setTimeout(() => navigate("/admin/products"), 2000);
+      setTimeout(() => navigate("/admin/product"), 2000);
     } catch (err) {
       console.error("Product creation error:", err);
 
@@ -334,7 +334,7 @@ const AdminProductForm = () => {
 
           {/* Price */}
           <div className="admin-input-group">
-            <label className="admin-input-label">Price*</label>
+            <label className="admin-input-label">Price in £ *</label>
             <input
               type="number"
               name="price"
@@ -409,10 +409,9 @@ const AdminProductForm = () => {
               onChange={handleChange}
               className="admin-input-field"
             >
-              <option value="">Select level</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+             <option value="">Select</option>
+                    <option value="10 mg">10 mg</option>
+                    <option value="20 mg">20 mg</option>
             </select>
           </div>
         </div>

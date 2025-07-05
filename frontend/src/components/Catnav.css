@@ -1,20 +1,18 @@
-/* Catnav.css - Perfectly Centered Text with Horizontal Scroll */
+/* Catnav.css - Modern Stunning Version */
 
- .category-nav-container {
-  position: static;
+.category-nav-container {
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 1000;
-  background: #f5f9ff;
-background: linear-gradient(to right, #f5f9ff, #f0f7ff);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   width: 100%;
-  height: 60px;
+  height: 72px;
   overflow: hidden;
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05); /* Softer shadow */
-  margin-bottom: 50px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Subtle bottom border */
-  padding: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .category-navbar {
@@ -22,99 +20,140 @@ background: linear-gradient(to right, #f5f9ff, #f0f7ff);
   height: 100%;
   overflow-x: auto;
   scrollbar-width: none;
-  padding: 0 calc(50% - 400px); /* Centers content when wide enough */
+  padding: 0 calc(50% - 600px);
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   align-items: center;
-  align-content: center;
-    
+  gap: 4px;
 }
 
 .category-navbar::-webkit-scrollbar {
   display: none;
 }
 
-.category-btn {
+.category-link {
   position: relative;
   background: transparent;
   border: none;
-  color: #555;
-  font-size: 0.95rem;
+  color: #4a4a4a;
+  font-size: 1rem;
   font-weight: 500;
-  padding: 0 24px;
-  height: 100%;
+  padding: 0 28px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
-  margin: 0 2px;
+  border-radius: 12px;
+  text-decoration: none;
+  overflow: hidden;
 }
 
-/* Centered text container */
 .category-text {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
-  display: inline-block;
-  text-align: center;
-  width: 100%;
+  transition: all 0.4s ease;
 }
 
-/* Hover and Active States */
-.category-btn:hover .category-text {
-  color: #222;
+/* Glow Effect */
+.category-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Hover Effects */
+.category-link:hover {
+  color: #2a2a2a;
+  transform: translateY(-2px);
+}
+
+.category-link:hover::before {
+  opacity: 1;
+}
+
+.category-link:hover .category-text {
   transform: translateY(-1px);
 }
 
-.category-btn.active .category-text {
+/* Active State */
+.category-link.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-weight: 600;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
 }
 
-/* Underline Animation */
+/* Liquid Fill Animation */
 .hover-effect {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 3px;
+  height: 2px;
   background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.3s ease;
+  transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-.category-btn:hover .hover-effect {
+.category-link:hover .hover-effect {
   transform: scaleX(1);
   transform-origin: left;
 }
 
-/* Active state styling */
-.category-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+/* Pulse Animation for Active */
+.category-link.active::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border: 2px solid rgba(102, 126, 234, 0.4);
+  border-radius: 16px;
+  animation: pulse 2s infinite;
 }
 
-.category-btn.active .hover-effect {
-  display: none;
+@keyframes pulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  70% { opacity: 0; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.05); }
 }
 
-/* Responsive Adjustments */
+/* Responsive Design */
 @media (max-width: 1200px) {
   .category-navbar {
-    padding: 0 20px;
+    padding: 0 24px;
   }
 }
 
 @media (max-width: 768px) {
-  .category-btn {
-    padding: 0 16px;
-    font-size: 0.85rem;
+  .category-link {
+    padding: 0 20px;
+    font-size: 0.9rem;
+    height: 40px;
   }
   
   .category-nav-container {
-    height: 50px;
+    height: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-link {
+    padding: 0 16px;
+    font-size: 0.85rem;
   }
 }

@@ -14,6 +14,7 @@ import AdminProductForm from "../components/Adminprad";
 import AdminProductList from "../components/AdminProductList";
 import Catnav from "../components/Catnav";
 import CartComponent from "../components/CartComponent";
+import PaymentPage from "../components/PaymentPage";
 
 
 /*const HomePage = ({ user, onLogout }) => {
@@ -66,7 +67,10 @@ const HomePage = () => {
         <div className="pr">
           <ProductCard />
         </div>
-         <CartComponent/>
+
+         
+        
+          
       </div>
     </>
   );

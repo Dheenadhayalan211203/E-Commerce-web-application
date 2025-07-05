@@ -16,7 +16,7 @@ const AdminProductList = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/admin/products`
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products`
       );
       setProducts(response.data);
     } catch (err) {
@@ -36,7 +36,7 @@ const AdminProductList = () => {
     try {
       setLoading(true);
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/admin/products/${productId}`
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}`
       );
       setSuccess('Product deleted successfully');
       fetchProducts();
@@ -53,7 +53,7 @@ const AdminProductList = () => {
     try {
       setLoading(true);
       await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/admin/products/${productId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}/status`,
         { is_active: !currentStatus }
       );
       setSuccess(`Product ${currentStatus ? 'deactivated' : 'activated'} successfully`);
@@ -187,7 +187,7 @@ const AdminProductList = () => {
     try {
       setLoading(true);
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/admin/products/${editingProduct.id}`,
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${editingProduct.id}`,
         editingProduct
       );
       setSuccess('Product updated successfully');
@@ -471,9 +471,9 @@ const AdminProductList = () => {
                     onChange={handleEditChange}
                   >
                     <option value="">Select</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="10 mg">10 mg</option>
+                    <option value="20 mg">20 mg</option>
+                      
                   </select>
                 </div>
 
