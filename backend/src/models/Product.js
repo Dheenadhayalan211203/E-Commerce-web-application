@@ -47,7 +47,7 @@ const Product = sequelize.define('Product', {
     allowNull: true,
     defaultValue: null,
     validate: {
-      isIn: [['low', 'medium', 'high', null]]
+      isIn: [['10 mg', '20 mg' , null]]
     }
   },
   description: {

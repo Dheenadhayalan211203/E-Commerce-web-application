@@ -8,6 +8,8 @@
       const Category = require('./models/Category');
       const Cart=require("./models/Cart")
       const router = express.Router();
+       
+
     
       
       require('dotenv').config();
@@ -32,6 +34,8 @@
       app.use(express.json({ limit: '50mb' }));
       app.use(express.urlencoded({ limit: '50mb', extended: true }));
       app.options('*', cors(corsOptions)); // Handle preflight
+       
+
 
       // Sync database models
       sequelize.sync()
