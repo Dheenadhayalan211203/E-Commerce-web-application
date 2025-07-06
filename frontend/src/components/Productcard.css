@@ -141,3 +141,132 @@
     flex-wrap: wrap;
     gap: 20px;
   }
+
+
+
+  /* Loading indicator */
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  grid-column: 1 / -1;
+  color: #666;
+}
+
+/* Placeholder styles */
+.product-card-placeholder {
+  opacity: 0.8;
+}
+
+.product-card-placeholder .placeholder-image {
+  background: #f0f0f0;
+}
+
+.product-card-placeholder h4,
+.product-card-placeholder p,
+.product-card-placeholder .product-price,
+.product-card-placeholder .product-stock {
+  background: #f0f0f0;
+  color: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card-placeholder h4::after,
+.product-card-placeholder p::after,
+.product-card-placeholder .product-price::after,
+.product-card-placeholder .product-stock::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Cache notice */
+.cache-notice {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 10px;
+  background: #fff8e1;
+  color: #ff6f00;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+/* Cached product style */
+.product-card-cached {
+  opacity: 0.9;
+  border: 1px dashed #ffb74d;
+}
+
+/* Loading and Error States */
+.loading-container,
+.error-container,
+.no-products {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-top: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-bottom: 15px;
+}
+
+.retry-button,
+.refresh-button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.retry-button:hover,
+.refresh-button:hover {
+  background: #2980b9;
+}
+
+.cache-notice {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Original styles remain unchanged */

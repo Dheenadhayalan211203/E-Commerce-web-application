@@ -3,11 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": ".",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --base=./",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview --port=4173",
+    "deploy": "vite build && echo 'Upload all contents of /dist to Hostinger'"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -16,7 +18,7 @@
     "@mui/material": "^7.2.0",
     "antd": "^5.26.3",
     "axios": "^1.10.0",
-    "frontend": "file:",
+    "lz-string": "^1.5.0",
     "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

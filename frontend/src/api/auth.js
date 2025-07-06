@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/auth/';
+const API_URL = 'https://e-commerce-web-application-k9ho.onrender.com/api/auth/';
 
 // Renamed from register to signupRequestOtp to reflect the new flow
 const signupRequestOtp = async (userData) => {

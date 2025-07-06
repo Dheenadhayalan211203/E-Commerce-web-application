@@ -11,7 +11,7 @@ const Catnav = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/categories");
+        const res = await axios.get("https://e-commerce-web-application-k9ho.onrender.com/api/categories");
         setCategories(res.data);
         if (res.data.length > 0) {
           const firstActive = res.data.find(cat => cat.is_active);

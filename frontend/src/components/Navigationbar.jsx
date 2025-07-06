@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navi.css';
 import { usecontext } from '../App';
-import { FaBars, FaTimes, FaUser, FaShoppingCart, FaCog } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaShoppingBag, FaCog } from 'react-icons/fa';
 import { MdAdminPanelSettings } from 'react-icons/md';
 
 const Navigation = () => {
@@ -70,15 +70,6 @@ const Navigation = () => {
             </button>
           </div>
 
-          <div className="navbar-right">
-            {user && (
-              <Link to="/cart" className="cart-icon" aria-label="Shopping Cart">
-                <FaShoppingCart />
-                <span className="cart-count"></span>
-              </Link>
-            )}
-          </div>
-
           <div className={`navbar-links-container ${isMobileMenuOpen ? 'active' : ''}`}>
             <button 
               className="mobile-close-button" 
@@ -109,6 +100,15 @@ const Navigation = () => {
                         Admin Panel
                       </button>
                     )}
+                    
+                    <Link 
+                      to="/cart" 
+                      className="cart-btn"
+                      onClick={closeMobileMenu}
+                    >
+                      <FaShoppingBag className="cart-icon" />
+                      Cart
+                    </Link>
                     
                     <button 
                       className="logout-btn"
@@ -154,4 +154,4 @@ const Navigation = () => {
   );
 };
 
-export default Navigation;  
+export default Navigation;

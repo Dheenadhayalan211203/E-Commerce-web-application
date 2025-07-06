@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext } from "react";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -21,15 +21,11 @@ import PaymentPage from "./components/PaymentPage";
 
 export const usecontext = createContext();
 
-// Admin Route Protection Component
 const AdminRoute = ({ children }) => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
-  
-  if (!storedUser || storedUser.IsAdmin !=1) {
-    // Redirect to login or home page if not admin
+  if (!storedUser || storedUser.IsAdmin != 1) {
     return <Navigate to="/unauthoraised" replace />;
   }
-
   return children;
 };
 
@@ -38,30 +34,27 @@ function App() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
   const handleLogout = () => {
     authService.logout();
     setUser(null);
-    window.location.href = "/"; // Using href instead of navigate
+    window.location.href = "/#/"; // Updated for HashRouter
   };
 
   return (
-    <usecontext.Provider value={{ user ,handleLogout }}>
+    <usecontext.Provider value={{ user, handleLogout }}>
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/product/:id" element={<Product />} />
-            <Route path="/notfound" element={<NotFoundPage />} />
-            <Route path="/unauthoraised" element={<UnauthorizedAccess />} />
-            <Route path="*" element={<NotFoundPage />} />
-            <Route path="/cart" element={<CartComponent />} />
-             
+          <Route path="/notfound" element={<NotFoundPage />} />
+          <Route path="/unauthoraised" element={<UnauthorizedAccess />} />
+          <Route path="*" element={<NotFoundPage />} />
+          <Route path="/cart" element={<CartComponent />} />
           <Route path="/checkout" element={<PaymentPage />} />
           <Route
             path="/admin/product"
@@ -71,34 +64,25 @@ function App() {
               </AdminRoute>
             }
           />
-
           <Route
             path="/admin/product/category"
             element={
               <AdminRoute>
-                  <CategoryCRUD/>
+                <CategoryCRUD />
               </AdminRoute>
             }
           />
-
-          <Route path="/admin/product/new"
-          element={
-            <AdminRoute>
-              <AdminProductForm/>
-            </AdminRoute>
-
-            
-          }>
-
-             
-
-
-          </Route>
-          {/* Add more routes for your e-commerce site */}
+          <Route
+            path="/admin/product/new"
+            element={
+              <AdminRoute>
+                <AdminProductForm />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </Router>
     </usecontext.Provider>
-    
   );
 }
 

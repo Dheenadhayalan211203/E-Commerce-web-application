@@ -5,12 +5,18 @@ import { useNavigate } from 'react-router-dom';
 function SignupForm() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [otp, setOtp] = useState(''); // New state for OTP
+  const [otp, setOtp] = useState('');
   const [message, setMessage] = useState('');
-  const [otpSent, setOtpSent] = useState(false); // State to control form stage
+  const [otpSent, setOtpSent] = useState(false);
   const navigate = useNavigate();
+
+  const validatePhone = (number) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(number);
+  };
 
   const handleInitialSignup = async (e) => {
     e.preventDefault();
@@ -21,10 +27,20 @@ function SignupForm() {
       return;
     }
 
+    if (!validatePhone(phone)) {
+      setMessage('Invalid phone number. It should be 10 digits.');
+      return;
+    }
+
     try {
-      const response = await authService.signupRequestOtp({ username, email, password });
+      const response = await authService.signupRequestOtp({
+        username,
+        email,
+        phone,
+        password
+      });
       setMessage(response.message);
-      setOtpSent(true); // Move to OTP verification stage
+      setOtpSent(true);
     } catch (error) {
       setMessage(error.response?.data?.message || 'Something went wrong during signup request.');
     }
@@ -37,8 +53,8 @@ function SignupForm() {
       await authService.verifyOtp(email, otp);
       setMessage('Signup successful! Redirecting to home...');
       setTimeout(() => {
-        navigate('/'); // Redirect to home page
-        window.location.reload(); // Force a reload to update UI state (e.g., header login status)
+        navigate('/');
+        window.location.reload();
       }, 1500);
     } catch (error) {
       setMessage(error.response?.data?.message || 'Something went wrong during OTP verification.');
@@ -60,7 +76,7 @@ function SignupForm() {
       <h2 style={styles.header}>Sign Up</h2>
       {message && <p style={styles.message}>{message}</p>}
 
-      {!otpSent ? ( // Stage 1: Initial signup details
+      {!otpSent ? (
         <form onSubmit={handleInitialSignup} style={styles.form}>
           <div style={styles.formGroup}>
             <label htmlFor="username" style={styles.label}>Username:</label>
@@ -82,6 +98,20 @@ function SignupForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               style={styles.input}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label htmlFor="phone" style={styles.label}>Phone:</label>
+            <input
+              type="tel"
+              id="phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+              style={styles.input}
+              pattern="[0-9]{10}"
+              maxLength="10"
+              placeholder="10-digit phone number"
             />
           </div>
           <div style={styles.formGroup}>
@@ -108,7 +138,7 @@ function SignupForm() {
           </div>
           <button type="submit" style={styles.button}>Send OTP & Sign Up</button>
         </form>
-      ) : ( // Stage 2: OTP verification
+      ) : (
         <form onSubmit={handleOtpVerification} style={styles.form}>
           <p style={styles.infoText}>An OTP has been sent to your email: <strong>{email}</strong></p>
           <div style={styles.formGroup}>
@@ -124,7 +154,13 @@ function SignupForm() {
             />
           </div>
           <button type="submit" style={styles.button}>Verify OTP & Complete Signup</button>
-          <button type="button" onClick={handleResendOtp} style={{ ...styles.button, backgroundColor: '#6c757d', marginTop: '10px' }}>Resend OTP</button>
+          <button
+            type="button"
+            onClick={handleResendOtp}
+            style={{ ...styles.button, backgroundColor: '#6c757d', marginTop: '10px' }}
+          >
+            Resend OTP
+          </button>
         </form>
       )}
 

@@ -28,7 +28,7 @@ const CategoryManagement = () => {
   const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/admin/categories');
+      const response = await axios.get('https://e-commerce-web-application-k9ho.onrender.com/api/admin/categories');
       const data = response.data;
       const normalizedCategories = Array.isArray(data) ? data : 
                                 (Array.isArray(data?.categories) ? data.categories : []);
@@ -82,13 +82,13 @@ const CategoryManagement = () => {
     try {
       if (currentCategory) {
         await axios.put(
-          `http://localhost:5000/api/admin/categories/${currentCategory.id}`, 
+          `https://e-commerce-web-application-k9ho.onrender.com/api/admin/categories/${currentCategory.id}`, 
           formData
         );
         showNotification('Category updated successfully!');
       } else {
         await axios.post(
-          'http://localhost:5000/api/admin/categories', 
+          'https://e-commerce-web-application-k9ho.onrender.com/api/admin/categories', 
           formData
         );
         showNotification('Category created successfully!');
@@ -105,7 +105,7 @@ const CategoryManagement = () => {
     if (!window.confirm('Are you sure you want to delete this category?')) return;
     try {
       await axios.delete(
-        `http://localhost:5000/api/admin/categories/${categoryId}`
+        `https://e-commerce-web-application-k9ho.onrender.com/api/admin/categories/${categoryId}`
       );
       showNotification('Category deleted successfully!');
       fetchCategories();

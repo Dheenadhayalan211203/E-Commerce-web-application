@@ -52,7 +52,7 @@ const AdminProductForm = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/categories");
+        const res = await axios.get("https://e-commerce-web-application-k9ho.onrender.com/api/categories");
         setCategories(res.data);
       } catch (err) {
         console.error("Failed to fetch categories", err);
@@ -244,7 +244,7 @@ const AdminProductForm = () => {
 
       const response = await axios.post(
         `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
+          import.meta.env.VITE_API_BASE_URL || "https://e-commerce-web-application-k9ho.onrender.com"
         }/api/admin/products`,
         payload,
         {

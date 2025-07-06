@@ -22,7 +22,7 @@ const ProductDisplay = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const res = await axios.get(`https://e-commerce-web-application-k9ho.onrender.com/api/products/${id}`);
         const data = res.data;
         setProduct(data);
 
@@ -81,7 +81,7 @@ const ProductDisplay = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/cart", {
+      const response = await axios.post("https://e-commerce-web-application-k9ho.onrender.com/api/cart", {
         productid: product.id,
         userid: user.id,
         email: user.email,

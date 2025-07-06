@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import "./CartComponent.css";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000",
-  timeout: 10000,
+  baseURL: "https://e-commerce-web-application-k9ho.onrender.com",
+  timeout: 30000,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -21,6 +21,7 @@ const CartComponent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [total, setTotal] = useState(0);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const navigate = useNavigate();
 
   const fetchCart = async () => {
@@ -125,6 +126,13 @@ const CartComponent = () => {
     }
   };
 
+  const handleCheckout = () => {
+    setIsCheckingOut(true);
+    setTimeout(() => {
+      navigate("/checkout");
+    }, 800); // Match this duration with the CSS animation duration
+  };
+
   useEffect(() => {
     fetchCart();
   }, [user]);
@@ -142,125 +150,129 @@ const CartComponent = () => {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="cart-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading your cart...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="cart-container">
-      <div className="cart-header">
-        <h2>
-          <FiShoppingCart /> Your Shopping Cart
-        </h2>
-        {cartItems.length > 0 && (
-          <button onClick={clearCart} className="clear-cart-btn">
-            <FiTrash2 /> Clear Cart
-          </button>
-        )}
-      </div>
-
-      {error && (
-        <div className="cart-error">
-          <p>{error}</p>
-          <button onClick={fetchCart} className="retry-btn">
-            Retry
-          </button>
-        </div>
-      )}
-
-      {cartItems.length === 0 ? (
-        <div className="cart-empty-state">
-          <FiShoppingCart size={48} />
-          <h3>Your cart is empty</h3>
-          <p>Looks like you haven't added anything to your cart yet.</p>
-          <button
-            className="continue-shopping-btn"
-            onClick={() => navigate("/products")}
-          >
-            Continue Shopping
-          </button>
+    <div className={`cart-container ${isCheckingOut ? "cart-slide-out" : ""}`}>
+      {loading ? (
+        <div className="cart-loading">
+          <div className="loading-spinner"></div>
+          <p>Loading your cart...</p>
         </div>
       ) : (
         <>
-          <div className="cart-items">
-            {cartItems.map((item) => (
-              <div key={`${item.id}-${item.quantity}`} className="cart-item">
-                <div className="item-image">
-                  <img
-                    src={
-                      item?.product?.image_base64
-                        ? `data:image/jpeg;base64,${item.product.image_base64}`
-                        : "/placeholder-product.jpg"
-                    }
-                    alt={item?.product?.name || "Product"}
-                    onError={(e) => {
-                      e.target.src = "/placeholder-product.jpg";
-                    }}
-                  />
-                </div>
-                <div className="item-details">
-                  <h3>{item?.product?.name || "Unnamed Product"}</h3>
-                  {item?.flavour && (
-                    <p className="item-flavor">Flavor: {item.flavour}</p>
-                  )}
-                  <p className="item-price">£ {item?.product?.price || 0}</p>
-                  <div className="item-quantity">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      disabled={item.quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2 italic transition-colors duration-200 hover:text-gray-600 dark:hover:text-gray-300">
-                    * Taxes will be calculated at checkout
-                  </p>
-                </div>
-                <div className="item-total">
-                  <p>£ {((item?.product?.price || 0) * item.quantity).toFixed(2)}</p>
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="remove-item-btn"
-                  >
-                    <FiX />
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="cart-header">
+            <h2>
+              <FiShoppingCart /> Your Shopping Cart
+            </h2>
+            {cartItems.length > 0 && (
+              <button onClick={clearCart} className="clear-cart-btn">
+                <FiTrash2 /> Clear Cart
+              </button>
+            )}
           </div>
 
-          <div className="cart-summary">
-            <div className="summary-row">
-              <span>Subtotal</span>
-              <span>£ {total.toFixed(2)}</span>
+          {error && (
+            <div className="cart-error">
+              <p>{error}</p>
+              <button onClick={fetchCart} className="retry-btn">
+                Retry
+              </button>
             </div>
-            <div className="summary-row">
-              <span>Shipping</span>
-              <span>FREE</span>
+          )}
+
+          {!loading && cartItems.length === 0 ? (
+            <div className="cart-empty-state">
+              <FiShoppingCart size={48} />
+              <h3>Your cart is empty</h3>
+              <p>Looks like you haven't added anything to your cart yet.</p>
+              <button
+                className="continue-shopping-btn"
+                onClick={() => navigate("/products")}
+              >
+                Continue Shopping
+              </button>
             </div>
-            <div className="summary-row total">
-              <span>Total</span>
-              <span>£ {total.toFixed(2)}</span>
-            </div>
-            <button
-              className="checkout-btn"
-              onClick={() => navigate("/checkout")}
-              disabled={cartItems.length === 0}
-            >
-              Proceed to Checkout
-            </button>
-          </div>
+          ) : (
+            <>
+              <div className="cart-items">
+                {cartItems.map((item) => (
+                  <div key={`${item.id}-${item.quantity}`} className="cart-item">
+                    <div className="item-image">
+                      <img
+                        src={
+                          item?.product?.image_base64
+                            ? `data:image/jpeg;base64,${item.product.image_base64}`
+                            : "/placeholder-product.jpg"
+                        }
+                        alt={item?.product?.name || "Product"}
+                        onError={(e) => {
+                          e.target.src = "/placeholder-product.jpg";
+                        }}
+                      />
+                    </div>
+                    <div className="item-details">
+                      <h3>{item?.product?.name || "Unnamed Product"}</h3>
+                      {item?.flavour && (
+                        <p className="item-flavor">Flavor: {item.flavour}</p>
+                      )}
+                      <p className="item-price">£ {item?.product?.price || 0}</p>
+                      <div className="item-quantity">
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          disabled={item.quantity <= 1}
+                        >
+                          <FiMinus />
+                        </button>
+                        <span>{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          <FiPlus />
+                        </button>
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2 italic transition-colors duration-200 hover:text-gray-600 dark:hover:text-gray-300">
+                        * Taxes will be calculated at checkout
+                      </p>
+                    </div>
+                    <div className="item-total">
+                      <p>£ {((item?.product?.price || 0) * item.quantity).toFixed(2)}</p>
+                      <button
+                        onClick={() => removeItem(item.id)}
+                        className="remove-item-btn"
+                      >
+                        <FiX />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="cart-summary">
+                <div className="summary-row">
+                  <span>Subtotal</span>
+                  <span>£ {total.toFixed(2)}</span>
+                </div>
+                <div className="summary-row">
+                  <span>Shipping</span>
+                  <span>FREE</span>
+                </div>
+                <div className="summary-row total">
+                  <span>Total</span>
+                  <span>£ {total.toFixed(2)}</span>
+                </div>
+                <button
+                  className="checkout-btn"
+                  onClick={handleCheckout}
+                  disabled={cartItems.length === 0 || isCheckingOut}
+                >
+                  {isCheckingOut ? (
+                    <span className="checkout-loader"></span>
+                  ) : (
+                    "Proceed to Checkout"
+                  )}
+                </button>
+              </div>
+            </>
+          )}
         </>
       )}
     </div>
