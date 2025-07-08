@@ -47,8 +47,7 @@ const Navigation = () => {
     document.body.style.overflow = 'auto';
   };
 
-  console.log(user)
-
+   
   return (
     <>
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>

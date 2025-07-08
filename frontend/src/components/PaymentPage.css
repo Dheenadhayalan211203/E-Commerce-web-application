@@ -441,3 +441,93 @@
     transform: rotate(360deg);
   }
 }
+
+/* Address Form Styles */
+.address-form {
+  margin-bottom: 2rem;
+}
+
+.address-form h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #2d3436;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.address-form h3 svg {
+  color: #6c5ce7;
+}
+
+.address-form textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: all 0.2s ease;
+}
+
+.address-form textarea:focus {
+  border-color: #6c5ce7;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+}
+
+/* Payment Method Updates */
+.method-option .razorpay-logo {
+  height: 24px;
+  margin-bottom: 0.5rem;
+}
+
+.method-option .cod-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #6c5ce7;
+}
+
+/* Shipping Details in Success Page */
+.shipping-details {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.shipping-details h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #2d3436;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shipping-details h3 svg {
+  color: #6c5ce7;
+}
+
+.shipping-details p {
+  line-height: 1.6;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .form-row .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .method-options {
+    flex-direction: column;
+  }
+}

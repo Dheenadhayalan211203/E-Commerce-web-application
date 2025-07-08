@@ -46,7 +46,7 @@ const HomePage = () => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-      console.log(user);
+      
     }
   }, []);
 
@@ -63,7 +63,7 @@ const HomePage = () => {
         <div className="navi">
           <Navigation />
         </div>
-        <Catnav />
+     
         <div className="pr">
           <ProductCard />
         </div>

@@ -1,72 +1,50 @@
-import axios from "axios";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import './Catnav.css';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Catnav = () => {
-  const [categories, setCategories] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(null);
-  const navRef = useRef(null);
+  const staticCategories = [
+    { id: 1, name: "Home", is_active: true },
+    { id: 2, name: "Compliant Vapes", is_active: true },
+    { id: 3, name: "Nicotine Salts", is_active: true },
+    { id: 4, name: "Nicotine Pouches", is_active: true },
+    { id: 5, name: "Vape Kits", is_active: true },
+    { id: 6, name: "Pods", is_active: true },
+    { id: 7, name: "Ambient", is_active: true },
+    { id: 8, name: "Smoking", is_active: true },
+    { id: 9, name: "SmokingDubai Chocolate", is_active: true }
+  ];
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get("https://e-commerce-web-application-k9ho.onrender.com/api/categories");
-        setCategories(res.data);
-        if (res.data.length > 0) {
-          const firstActive = res.data.find(cat => cat.is_active);
-          setActiveCategory(firstActive ? firstActive.name.toLowerCase() : null);
-        }
-      } catch (error) {
-        console.error("Error fetching categories", error);
-      }
-    };
+  const [activeCategory, setActiveCategory] = useState("");
+  const navRef = useRef(null);
+  const navigate = useNavigate();
 
-    fetchCategories();
-  }, []);
+  const handleCategoryClick = (name, e) => {
+    e.preventDefault();
+    const encodedName = encodeURIComponent(name);
+    setActiveCategory(name.toLowerCase());
+    navigate(`/category/${encodedName}`);
+  };
 
-  const createSlug = (name) => {
-    return name
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '') // Remove special chars
-      .replace(/\s+/g, '-')     // Replace spaces with -
-      .replace(/-+/g, '-');     // Replace multiple - with single -
-  };
-
-  const handleCategoryClick = (name, e) => {
-    e.preventDefault();
-    setActiveCategory(name.toLowerCase());
-    if (navRef.current) {
-      const button = e.target.closest('.category-link');
-      if (button) {
-        button.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'center'
-        });
-      }
-    }
-  };
-
-  return (
-    <div className="category-nav-container">
-      <div className="category-navbar" ref={navRef}>
-        {categories.map((cat) =>
-          cat.is_active ? (
-            <Link 
-              to={`/category/${createSlug(cat.name)}`}
-              key={cat.id}
-              className={`category-link ${activeCategory === cat.name.toLowerCase() ? 'active' : ''}`}
-              onClick={(e) => handleCategoryClick(cat.name, e)}
-            >
-              <span className="category-text">{cat.name}</span>
-              <span className="hover-effect"></span>
-            </Link>
-          ) : null
-        )}
-      </div>
-    </div>
-  );
+  return (
+    <div className="category-nav-container">
+      <div className="category-navbar" ref={navRef}>
+        {staticCategories.map((cat) =>
+          cat.is_active ? (
+            <Link 
+              to={`/category/${encodeURIComponent(cat.name)}`}
+              key={cat.id}
+              className={`category-link ${activeCategory === cat.name.toLowerCase() ? 'active' : ''}`}
+              onClick={(e) => handleCategoryClick(cat.name, e)}
+            >
+              <span className="category-text">{cat.name}</span>
+              <span className="hover-effect"></span>
+            </Link>
+          ) : null
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default Catnav;

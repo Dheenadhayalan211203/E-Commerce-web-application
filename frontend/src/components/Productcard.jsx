@@ -6,7 +6,7 @@ import lzstring from 'lz-string';
 
 const CACHE_KEY = 'products_cache_v2';
 const CACHE_EXPIRY_HOURS = 6;
-const API_TIMEOUT = 15000; // 15 seconds timeout
+const API_TIMEOUT = 50000; // 15 seconds timeout
 const MAX_RETRIES = 2;
 
 const ProductCard = () => {
@@ -17,7 +17,6 @@ const ProductCard = () => {
   const [retryCount, setRetryCount] = useState(0);
   const navigate = useNavigate();
 
-  // Get cached products with validation
   const getCachedProducts = () => {
     try {
       const cachedData = localStorage.getItem(CACHE_KEY);
@@ -28,7 +27,6 @@ const ProductCard = () => {
       
       const { data, timestamp, version } = JSON.parse(decompressed);
       
-      // Validate cache
       const isExpired = (Date.now() - timestamp) > (CACHE_EXPIRY_HOURS * 60 * 60 * 1000);
       const isValid = Array.isArray(data) && data.length > 0;
       
@@ -39,14 +37,22 @@ const ProductCard = () => {
     }
   };
 
-  // Save to cache with validation
   const saveToCache = (data) => {
     if (!Array.isArray(data) || data.length === 0) return false;
     
     try {
       const cacheData = {
-        data: data.map(({ id, name, price, stock, category, image_base64 }) => ({
-          id, name, price, stock, category, image_base64
+        data: data.map(product => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          stock: product.stock,
+          category: product.category,
+          image_base64: product.image_base64,
+          brand: product.brand,
+          description: product.description,
+          flavors_data: product.flavors_data,
+          _timestamp: Date.now() // Add timestamp for individual products
         })),
         timestamp: Date.now(),
         version: 2
@@ -57,7 +63,6 @@ const ProductCard = () => {
       return true;
     } catch (e) {
       console.warn("Cache write failed:", e);
-      // If storage is full, try to clear old cache
       if (e.name === 'QuotaExceededError') {
         localStorage.removeItem(CACHE_KEY);
       }
@@ -72,7 +77,6 @@ const ProductCard = () => {
     }
 
     try {
-      // Try cache first if not retrying
       if (!isRetry) {
         const cachedProducts = getCachedProducts();
         if (cachedProducts) {
@@ -81,37 +85,37 @@ const ProductCard = () => {
         }
       }
 
-      // Fetch fresh data
       const response = await axios.get(
         "https://e-commerce-web-application-k9ho.onrender.com/api/products",
         { timeout: API_TIMEOUT }
       );
       
-      // Validate response
       if (!response.data || !Array.isArray(response.data)) {
         throw new Error('Invalid API response format');
       }
 
-      setProducts(response.data);
+      const productsWithTimestamp = response.data.map(product => ({
+        ...product,
+        _timestamp: Date.now()
+      }));
+
+      setProducts(productsWithTimestamp);
       setUsingCache(false);
       setRetryCount(0);
-      saveToCache(response.data);
+      saveToCache(productsWithTimestamp);
     } catch (err) {
       console.error("Fetch error:", err);
       
-      // Retry logic
       if (retryCount < MAX_RETRIES) {
-        const delay = 1000 * (retryCount + 1); // 1s, 2s, etc.
+        const delay = 1000 * (retryCount + 1);
         console.log(`Retrying in ${delay}ms...`);
         setRetryCount(prev => prev + 1);
         setTimeout(() => fetchProducts(true), delay);
         return;
       }
 
-      // Final error handling
       setError(err.message || 'Failed to load products');
       
-      // Fallback to cache if available
       const cachedProducts = getCachedProducts();
       if (cachedProducts && !products.length) {
         setProducts(cachedProducts);
@@ -129,9 +133,16 @@ const ProductCard = () => {
     fetchProducts();
   }, []);
 
-  const handleProductClick = (productId) => {
-    navigate(`/product/${productId}`);
+  const handleProductClick = (product) => {
+    navigate(`/product/${product.id}`, {
+      state: { 
+        productData: product,
+        fromProductList: true 
+      }
+    });
   };
+
+  
 
   const handleRetry = () => {
     setRetryCount(0);
@@ -181,7 +192,7 @@ const ProductCard = () => {
         <div 
           className="product-card" 
           key={product.id}
-          onClick={() => handleProductClick(product.id)}
+          onClick={() => handleProductClick(product)}
           style={{ cursor: 'pointer' }}
         >
           {product.price < 20 && <div className="product-badge">Sale</div>}
@@ -220,7 +231,7 @@ const ProductCard = () => {
                 <button 
                   className="cart-btn" 
                   disabled={product.stock <= 0}
-                  onClick={(e) => e.stopPropagation()}
+                   
                 >
                   <i className="fa fa-shopping-cart"></i>
                 </button>

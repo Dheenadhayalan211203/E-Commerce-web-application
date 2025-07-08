@@ -16,8 +16,9 @@ import UnauthorizedAccess from "./pages/UnauthorizedAccess";
 import CRUD from "./pages/AdminCRUD";
 import AdminProductForm from "./components/Adminprad";
 import CategoryCRUD from "./pages/Admincategoryadd";
-import CartComponent from "./components/CartComponent";
+ 
 import PaymentPage from "./components/PaymentPage";
+import Mycart from "./pages/Mycart";
 
 export const usecontext = createContext();
 
@@ -37,6 +38,12 @@ function App() {
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
+  useEffect(()=>{
+
+    
+
+  },[])
+
   const handleLogout = () => {
     authService.logout();
     setUser(null);
@@ -54,7 +61,7 @@ function App() {
           <Route path="/notfound" element={<NotFoundPage />} />
           <Route path="/unauthoraised" element={<UnauthorizedAccess />} />
           <Route path="*" element={<NotFoundPage />} />
-          <Route path="/cart" element={<CartComponent />} />
+          <Route path="/cart" element={<Mycart />} />
           <Route path="/checkout" element={<PaymentPage />} />
           <Route
             path="/admin/product"

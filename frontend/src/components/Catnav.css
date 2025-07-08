@@ -1,159 +1,102 @@
-/* Catnav.css - Modern Stunning Version */
+/* Catnav.css */
 
 .category-nav-container {
-  position:static;
+  width: 100%;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 1rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  width: 100%;
-  height: 72px;
-  overflow: hidden;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .category-navbar {
   display: flex;
-  height: 100%;
   overflow-x: auto;
-  scrollbar-width: none;
-  padding: 0 calc(50% - 600px);
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
-  align-items: center;
-  gap: 4px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 0 2rem;
+  gap: 0.5rem;
 }
 
 .category-navbar::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .category-link {
   position: relative;
-  background: transparent;
-  border: none;
-  color: #4a4a4a;
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0 28px;
-  height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  flex-shrink: 0;
-  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  color: #e6e6e6;
   text-decoration: none;
-  overflow: hidden;
+  font-weight: 500;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.category-text {
-  position: relative;
-  z-index: 3;
-  pointer-events: none;
-  transition: all 0.4s ease;
+.category-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Glow Effect */
-.category-link::before {
-  content: '';
+.category-link.active {
+  background: linear-gradient(135deg, #6e45e2 0%, #88d3ce 100%);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(110, 69, 226, 0.4);
+}
+
+.category-link.active .hover-effect {
+  opacity: 0;
+}
+
+.hover-effect {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(110, 69, 226, 0.4) 0%, rgba(136, 211, 206, 0.4) 100%);
+  border-radius: 30px;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
-/* Hover Effects */
-.category-link:hover {
-  color: #2a2a2a;
-  transform: translateY(-2px);
-}
-
-.category-link:hover::before {
+.category-link:hover .hover-effect {
   opacity: 1;
 }
 
-.category-link:hover .category-text {
-  transform: translateY(-1px);
+.category-text {
+  position: relative;
+  z-index: 1;
 }
 
-/* Active State */
-.category-link.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-  transform: translateY(-2px);
-}
-
-/* Liquid Fill Animation */
-.hover-effect {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.6s cubic-bezier(0.65, 0, 0.35, 1);
-}
-
-.category-link:hover .hover-effect {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-
-/* Pulse Animation for Active */
-.category-link.active::after {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
-  border: 2px solid rgba(102, 126, 234, 0.4);
-  border-radius: 16px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.6; transform: scale(1); }
-  70% { opacity: 0; transform: scale(1.05); }
-  100% { opacity: 0; transform: scale(1.05); }
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .category-navbar {
-    padding: 0 24px;
-  }
-}
-
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .category-link {
-    padding: 0 20px;
-    font-size: 0.9rem;
-    height: 40px;
+  .category-navbar {
+    padding: 0 1rem;
+    gap: 0.25rem;
   }
   
-  .category-nav-container {
-    height: 64px;
+  .category-link {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 480px) {
+  .category-nav-container {
+    padding: 0.5rem 0;
+  }
+  
   .category-link {
-    padding: 0 16px;
-    font-size: 0.85rem;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
   }
 }

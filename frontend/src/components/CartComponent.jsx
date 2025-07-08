@@ -129,7 +129,7 @@ const CartComponent = () => {
   const handleCheckout = () => {
     setIsCheckingOut(true);
     setTimeout(() => {
-      navigate("/checkout");
+      navigate("/checkout",{state:{cartItems}});
     }, 800); // Match this duration with the CSS animation duration
   };
 
@@ -220,13 +220,13 @@ const CartComponent = () => {
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                         >
-                          <FiMinus />
+                         -
                         </button>
                         <span>{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
-                          <FiPlus />
+                         +
                         </button>
                       </div>
                       <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-2 italic transition-colors duration-200 hover:text-gray-600 dark:hover:text-gray-300">
