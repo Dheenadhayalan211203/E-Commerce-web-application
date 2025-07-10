@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navi.css';
 import { usecontext } from '../App';
-import { FaBars, FaTimes, FaUser, FaShoppingBag, FaCog } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaShoppingCart, FaCog } from 'react-icons/fa';
 import { MdAdminPanelSettings } from 'react-icons/md';
 
 const Navigation = () => {
@@ -18,6 +18,7 @@ const Navigation = () => {
     } else {
       setAdmin(false);
     }
+     
   }, [user]);
 
   useEffect(() => {
@@ -100,13 +101,9 @@ const Navigation = () => {
                       </button>
                     )}
                     
-                    <Link 
-                      to="/cart" 
-                      className="cart-btn"
-                      onClick={closeMobileMenu}
-                    >
-                      <FaShoppingBag className="cart-icon" />
-                      Cart
+                    <Link to="/cart" onClick={closeMobileMenu}>
+                      <FaShoppingCart className="cart-icon" />
+                      <span className="cart-text">Cart</span>
                     </Link>
                     
                     <button 

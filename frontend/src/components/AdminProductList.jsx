@@ -1,11 +1,12 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AdminProductList.css';
 
 const AdminProductList = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [localLoading, setLocalLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [editingProduct, setEditingProduct] = useState(null);
@@ -34,7 +35,7 @@ const AdminProductList = () => {
   const handleDelete = async (productId) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     try {
-      setLoading(true);
+      setLocalLoading(true);
       await axios.delete(
         `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}`
       );
@@ -45,13 +46,13 @@ const AdminProductList = () => {
       setError('Failed to delete product');
       console.error('Delete product error:', err);
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
   const toggleProductStatus = async (productId, currentStatus) => {
     try {
-      setLoading(true);
+      setLocalLoading(true);
       await axios.patch(
         `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}/status`,
         { is_active: !currentStatus }
@@ -63,7 +64,7 @@ const AdminProductList = () => {
       setError('Failed to update product status');
       console.error('Toggle status error:', err);
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
@@ -176,7 +177,12 @@ const AdminProductList = () => {
       flavors_data: {
         flavours: [
           ...prev.flavors_data.flavours,
-          { flr: '', imagestring: '' }
+          { 
+            flr: '', 
+            imagestring: '',
+            stock: 0,
+            vat: 20
+          }
         ]
       }
     }));
@@ -185,7 +191,7 @@ const AdminProductList = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      setLocalLoading(true);
       await axios.put(
         `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${editingProduct.id}`,
         editingProduct
@@ -198,12 +204,27 @@ const AdminProductList = () => {
       setError('Failed to update product');
       console.error('Update product error:', err);
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
   return (
     <div className="admin-product-list-container">
+      {/* Global Loading Popup */}
+      {loading && (
+        <div className="admin-loading-popup">
+          <div className="admin-loading-spinner"></div>
+          <p>Loading products...</p>
+        </div>
+      )}
+
+      {/* Local Loading Popup */}
+      {localLoading && (
+        <div className="admin-local-loading-popup">
+          <div className="admin-loading-spinner"></div>
+        </div>
+      )}
+
       <button onClick={() => navigate(-1)} className="admin-back-button">
         <i className="fas fa-arrow-left"></i> Back to Dashboard
       </button>
@@ -223,7 +244,6 @@ const AdminProductList = () => {
         >
           <i className="fas fa-plus"></i> Add New Category
         </button>
-
       </div>
 
       {error && (
@@ -289,24 +309,7 @@ const AdminProductList = () => {
                       <td>${product.price}</td>
                       <td>{product.stock}</td>
                       <td>
-                        {product.flavors_data?.flavours?.length > 0 ? (
-                          <div className="admin-flavor-badges">
-                            {product.flavors_data.flavours.map((flavor, i) => (
-                              <span key={i} className="admin-flavor-badge">
-                                {flavor.flr}
-                                {flavor.imagestring && (
-                                  <img
-                                    src={`data:image/jpeg;base64,${flavor.imagestring}`}
-                                    alt={flavor.flr}
-                                    className="admin-flavor-image"
-                                  />
-                                )}
-                              </span>
-                            ))}
-                          </div>
-                        ) : (
-                          'No flavors'
-                        )}
+                        {product.flavors_data?.flavours?.length || 0} flavors
                       </td>
                       <td>
                         <span className={`admin-status-badge ${product.is_active ? 'active' : 'inactive'}`}>
@@ -326,23 +329,44 @@ const AdminProductList = () => {
                           <button
                             onClick={() => startEditing(product)}
                             className="admin-edit-button"
+                            disabled={localLoading}
                           >
-                            <i className="fas fa-edit"></i> Edit
+                            {localLoading ? (
+                              <i className="fas fa-spinner fa-spin"></i>
+                            ) : (
+                              <>
+                                <i className="fas fa-edit"></i> Edit
+                              </>
+                            )}
                           </button>
                           <button
                             onClick={() => handleDelete(product.id)}
                             className="admin-delete-button"
+                            disabled={localLoading}
                           >
-                            <i className="fas fa-trash"></i> Delete
+                            {localLoading ? (
+                              <i className="fas fa-spinner fa-spin"></i>
+                            ) : (
+                              <>
+                                <i className="fas fa-trash"></i> Delete
+                              </>
+                            )}
                           </button>
                           <button
                             onClick={() => toggleProductStatus(product.id, product.is_active)}
                             className={`admin-status-button ${product.is_active ? 'deactivate' : 'activate'}`}
+                            disabled={localLoading}
                           >
-                            {product.is_active ? (
-                              <><i className="fas fa-toggle-off"></i> Deactivate</>
+                            {localLoading ? (
+                              <i className="fas fa-spinner fa-spin"></i>
+                            ) : product.is_active ? (
+                              <>
+                                <i className="fas fa-toggle-off"></i> Deactivate
+                              </>
                             ) : (
-                              <><i className="fas fa-toggle-on"></i> Activate</>
+                              <>
+                                <i className="fas fa-toggle-on"></i> Activate
+                              </>
                             )}
                           </button>
                         </div>
@@ -473,7 +497,6 @@ const AdminProductList = () => {
                     <option value="">Select</option>
                     <option value="10 mg">10 mg</option>
                     <option value="20 mg">20 mg</option>
-                      
                   </select>
                 </div>
 
@@ -519,24 +542,55 @@ const AdminProductList = () => {
                   </h4>
                   {editingProduct.flavors_data.flavours.map((flavor, index) => (
                     <div key={index} className="admin-flavor-edit-item">
-                      <input
-                        type="text"
-                        value={flavor.flr}
-                        onChange={(e) => handleFlavorChange(index, 'flr', e.target.value)}
-                        placeholder="Flavor name"
-                        required
-                      />
-                      <label className="admin-image-upload-label">
+                      <div className="admin-flavor-input-group">
+                        <label>Flavor Name</label>
                         <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => handleFlavorImageUpload(e, index)}
-                          className="admin-image-upload-input"
+                          type="text"
+                          value={flavor.flr}
+                          onChange={(e) => handleFlavorChange(index, 'flr', e.target.value)}
+                          placeholder="Flavor name"
+                          required
                         />
-                        <span className="admin-image-upload-button">
-                          {flavor.imagestring ? 'Change Image' : 'Add Image'}
-                        </span>
-                      </label>
+                      </div>
+
+                      <div className="admin-flavor-input-group">
+                        <label>Stock</label>
+                        <input
+                          type="number"
+                          value={flavor.stock || 0}
+                          onChange={(e) => handleFlavorChange(index, 'stock', e.target.value)}
+                          min="0"
+                          placeholder="Stock"
+                        />
+                      </div>
+
+                      <div className="admin-flavor-input-group">
+                        <label>VAT (%)</label>
+                        <input
+                          type="number"
+                          value={flavor.vat || 20}
+                          onChange={(e) => handleFlavorChange(index, 'vat', e.target.value)}
+                          min="0"
+                          step="0.1"
+                          placeholder="VAT %"
+                        />
+                      </div>
+
+                      <div className="admin-flavor-input-group">
+                        <label>Image</label>
+                        <label className="admin-image-upload-label">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleFlavorImageUpload(e, index)}
+                            className="admin-image-upload-input"
+                          />
+                          <span className="admin-image-upload-button">
+                            {flavor.imagestring ? 'Change Image' : 'Add Image'}
+                          </span>
+                        </label>
+                      </div>
+
                       {flavor.imagestring && (
                         <div className="admin-current-image-container">
                           <img
@@ -546,12 +600,13 @@ const AdminProductList = () => {
                           />
                         </div>
                       )}
+
                       <button
                         type="button"
                         onClick={() => removeFlavor(index)}
                         className="admin-remove-flavor-button"
                       >
-                        <i className="fas fa-trash"></i>
+                        <i className="fas fa-trash"></i> Remove
                       </button>
                     </div>
                   ))}
@@ -565,13 +620,24 @@ const AdminProductList = () => {
                 </div>
 
                 <div className="admin-edit-form-buttons admin-full-width">
-                  <button type="submit" className="admin-save-button">
-                    <i className="fas fa-save"></i> Save Changes
+                  <button 
+                    type="submit" 
+                    className="admin-save-button"
+                    disabled={localLoading}
+                  >
+                    {localLoading ? (
+                      <i className="fas fa-spinner fa-spin"></i>
+                    ) : (
+                      <>
+                        <i className="fas fa-save"></i> Save Changes
+                      </>
+                    )}
                   </button>
                   <button
                     type="button"
                     onClick={cancelEditing}
                     className="admin-cancel-button"
+                    disabled={localLoading}
                   >
                     <i className="fas fa-times"></i> Cancel
                   </button>

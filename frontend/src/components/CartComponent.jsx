@@ -42,6 +42,8 @@ const CartComponent = () => {
       setCartItems(validItems);
       calculateTotal(validItems);
       setError(null);
+
+      
     } catch (err) {
       console.error("Cart fetch error:", {
         message: err.message,
@@ -136,6 +138,8 @@ const CartComponent = () => {
   useEffect(() => {
     fetchCart();
   }, [user]);
+
+    
 
   if (!user) {
     return (

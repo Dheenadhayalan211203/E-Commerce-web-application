@@ -453,3 +453,36 @@
     padding: 0.7rem;
   }
 }
+
+
+/* Add these styles to your AdminPrad.css file */
+
+/* Flavor Form Grid */
+.admin-flavor-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Flavor Details */
+.admin-flavor-details {
+  display: flex;
+  justify-content: space-between;
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .admin-flavor-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-flavor-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

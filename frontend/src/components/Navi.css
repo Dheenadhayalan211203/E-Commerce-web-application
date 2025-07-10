@@ -215,29 +215,49 @@ button {
   background: rgba(139, 92, 246, 0.2);
 }
 
-/* Cart Button Styles */
+/* Updated Cart Button Styles */
 .cart-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  background: rgba(59, 130, 246, 0.1);
-  color: var(--primary-color);
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--text-light);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--border-radius);
   text-decoration: none;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   transition: var(--transition);
+  position: relative;
 }
 
 .cart-btn:hover {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
+  color: var(--accent-color);
 }
 
+/* Cart Icon Specific Styles */
 .cart-icon {
-  font-size: 1rem;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+ color: #f3f4f6;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.cart-text
+{
+  text-decoration: none;
+  color: white;
+  
+}
+
+/* Animate the cart icon on hover */
+.cart-btn:hover .cart-icon {
+  transform: scale(1.1) translateY(-2px);
 }
 
 /* Mobile Menu Styles */
@@ -298,6 +318,29 @@ button {
     padding: 0.8rem;
     width: 100%;
   }
+
+  .cart-icon {
+    font-size: 1.4rem;
+  }
+}
+
+/* Hide text and enlarge icon on small mobile */
+@media (max-width: 480px) {
+  .cart-text {
+    display: none;
+  }
+  
+  .cart-icon {
+    font-size: 1.5rem;
+  }
+  
+  .cart-btn {
+    padding: 0.6rem;
+    width: 40px;
+    height: 40px;
+    justify-content: center;
+    border-radius: 50%;
+  }
 }
 
 /* Overlay for mobile menu */
@@ -318,22 +361,6 @@ button {
 .navbar-overlay.active {
   opacity: 1;
   pointer-events: all;
-}
-
-/* Animations */
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.navbar {
-  animation: fadeInDown 0.5s ease-out forwards;
 }
 
 /* Focus styles for accessibility */

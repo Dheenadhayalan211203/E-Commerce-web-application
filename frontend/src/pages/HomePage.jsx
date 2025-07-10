@@ -15,6 +15,7 @@ import AdminProductList from "../components/AdminProductList";
 import Catnav from "../components/Catnav";
 import CartComponent from "../components/CartComponent";
 import PaymentPage from "../components/PaymentPage";
+import BrandsSection from "../components/BrandSection";
 
 
 /*const HomePage = ({ user, onLogout }) => {
@@ -63,7 +64,12 @@ const HomePage = () => {
         <div className="navi">
           <Navigation />
         </div>
-     
+          <Catnav/>
+          <div className="brand">
+              <div>
+                < BrandsSection/>
+              </div>
+          </div>
         <div className="pr">
           <ProductCard />
         </div>

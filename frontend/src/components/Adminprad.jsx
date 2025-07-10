@@ -8,7 +8,6 @@ const AdminProductForm = () => {
   const productImageInputRef = useRef(null);
   const flavorImageInputRef = useRef(null);
 
-  // Initialize form data with proper flavor structure
   const [formData, setFormData] = useState({
     name: "",
     brand: "",
@@ -37,6 +36,8 @@ const AdminProductForm = () => {
     name: "",
     image: null,
     imagePreview: "",
+    stock: "0",
+    vat: "20", // Default VAT percentage
   });
 
   // Clean up object URLs
@@ -76,6 +77,14 @@ const AdminProductForm = () => {
         if (isNaN(parseInt(value))) return "Stock must be a number";
         if (parseInt(value) < 0) return "Stock cannot be negative";
         return "";
+      case "flavorStock":
+        if (isNaN(parseInt(value))) return "Stock must be a number";
+        if (parseInt(value) < 0) return "Stock cannot be negative";
+        return "";
+      case "vat":
+        if (isNaN(parseFloat(value))) return "VAT must be a number";
+        if (parseFloat(value) < 0) return "VAT cannot be negative";
+        return "";
       default:
         return "";
     }
@@ -87,9 +96,12 @@ const AdminProductForm = () => {
     setErrors((prev) => ({ ...prev, [name]: validateField(name, value) }));
   };
 
-  const handleFlavorNameChange = (e) => {
-    setNewFlavor((prev) => ({ ...prev, name: e.target.value }));
-    setErrors((prev) => ({ ...prev, flavors: "" }));
+  const handleFlavorChange = (e) => {
+    const { name, value } = e.target;
+    setNewFlavor((prev) => ({ ...prev, [name]: value }));
+    if (name === "stock" || name === "vat") {
+      setErrors((prev) => ({ ...prev, flavors: validateField(name, value) }));
+    }
   };
 
   const validateImage = (file, maxSize) => {
@@ -136,6 +148,14 @@ const AdminProductForm = () => {
       return;
     }
 
+    const stockError = validateField("flavorStock", newFlavor.stock);
+    const vatError = validateField("vat", newFlavor.vat);
+    
+    if (stockError || vatError) {
+      setErrors((prev) => ({ ...prev, flavors: stockError || vatError }));
+      return;
+    }
+
     const flavorExists = formData.flavors_data.flavours.some(
       (flavor) =>
         flavor.flr.toLowerCase() === newFlavor.name.trim().toLowerCase()
@@ -159,6 +179,8 @@ const AdminProductForm = () => {
           {
             flr: newFlavor.name.trim(),
             imagestring: cleanImageString,
+            stock: parseInt(newFlavor.stock) || 0,
+            vat: parseFloat(newFlavor.vat) || 20,
           },
         ],
       },
@@ -168,6 +190,8 @@ const AdminProductForm = () => {
       name: "",
       image: null,
       imagePreview: "",
+      stock: "0",
+      vat: "20",
     });
   };
 
@@ -472,12 +496,46 @@ const AdminProductForm = () => {
               <div className="admin-flavor-input-group">
                 <input
                   type="text"
+                  name="name"
                   value={newFlavor.name}
-                  onChange={handleFlavorNameChange}
+                  onChange={handleFlavorChange}
                   className={`admin-input-field ${
                     errors.flavors ? "error" : ""
                   }`}
                   placeholder="Flavor Name"
+                />
+              </div>
+              <div className="admin-flavor-input-group">
+                <label className="admin-input-label">
+                Available Stock
+            </label>
+                <input
+                  type="number"
+                  name="stock"
+                  value={newFlavor.stock}
+                  onChange={handleFlavorChange}
+                  min="0"
+                  className={`admin-input-field ${
+                    errors.flavors ? "error" : ""
+                  }`}
+                  placeholder="Stock"
+                />
+              </div>
+              <div className="admin-flavor-input-group">
+                <label className="admin-input-label">
+                 VAT %
+            </label>
+                <input
+                  type="number"
+                  name="vat"
+                  value={newFlavor.vat}
+                  onChange={handleFlavorChange}
+                  min="0"
+                  step="0.1"
+                  className={`admin-input-field ${
+                    errors.flavors ? "error" : ""
+                  }`}
+                  placeholder="VAT %"
                 />
               </div>
               <div className="admin-flavor-input-group">
@@ -531,6 +589,10 @@ const AdminProductForm = () => {
                 {formData.flavors_data.flavours.map((flavor, index) => (
                   <div key={index} className="admin-flavor-card">
                     <div className="admin-flavor-name">{flavor.flr}</div>
+                    <div className="admin-flavor-details">
+                      <div>Stock: {flavor.stock}</div>
+                      <div>VAT: {flavor.vat}%</div>
+                    </div>
                     <div className="admin-image-preview-container">
                       <img
                         src={`data:image/jpeg;base64,${flavor.imagestring}`}
