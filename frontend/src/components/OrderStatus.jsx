@@ -1,18 +1,33 @@
- import React from "react";
-import { FiCheckCircle, FiMapPin, FiPackage, FiClock } from "react-icons/fi";
+import React from "react";
+import { FiCheckCircle, FiMapPin, FiPackage, FiClock, FiCalendar } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import "./OrderStatus.css";
 
 const OrderStatus = ({ orderDetails }) => {
   const navigate = useNavigate();
+  
+  // Destructure with defaults that match backend response structure
   const {
-    cartItems = [],
+    orderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`,
+    items = [],
     subtotal = 0,
     tax = 0,
-    total = 0,
-    paymentMethod = "",
-    address = {},
+    totalAmount = 0,
+    paymentMethod = "cod",
+    paymentStatus = false,
+    status = "pending",
+    shippingAddress = {},
+    createdAt = new Date().toISOString()
   } = orderDetails;
+
+  // Format date for display
+  const orderDate = new Date(createdAt).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
   return (
     <div className="order-status-container">
@@ -20,16 +35,31 @@ const OrderStatus = ({ orderDetails }) => {
         <div className="status-header">
           <FiCheckCircle className="success-icon" />
           <h2>Order Successful!</h2>
+          <p className="order-id">Order ID: {orderId}</p>
           <p className="status-message">
             {paymentMethod === "cod" ? (
               <>
-                <FiClock className="status-icon" /> Your order has been placed successfully. 
-                Please have £{total.toFixed(2)} ready for delivery.
+                <FiClock className="status-icon" /> 
+                Your order is {status}. Please have £{totalAmount.toFixed(2)} ready for delivery.
               </>
+            ) : paymentStatus ? (
+              "Thank you for your purchase. Your payment was successful."
             ) : (
-              "Thank you for your purchase. Your order has been placed successfully."
+              "Your order is being processed. Please complete your payment."
             )}
           </p>
+        </div>
+
+        <div className="order-meta">
+          <div className="meta-item">
+            <FiCalendar className="meta-icon" />
+            <span>Order Date: {orderDate}</span>
+          </div>
+          <div className="meta-item">
+            <div className={`status-badge ${status}`}>
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </div>
+          </div>
         </div>
 
         <div className="order-details-section">
@@ -39,17 +69,17 @@ const OrderStatus = ({ orderDetails }) => {
             </h3>
             <div className="details-grid">
               <div>
-                <strong>Name:</strong> {address.firstName} {address.lastName}
+                <strong>Name:</strong> {shippingAddress.firstName} {shippingAddress.lastName}
               </div>
               <div>
-                <strong>Address:</strong> {address.streetAddress}, {address.city}, {address.county}, {address.postcode}
+                <strong>Address:</strong> {shippingAddress.streetAddress}, {shippingAddress.city}, {shippingAddress.county}, {shippingAddress.postcode}
               </div>
               <div>
-                <strong>Phone:</strong> {address.phone}
+                <strong>Phone:</strong> {shippingAddress.phone}
               </div>
-              {address.deliveryInstructions && (
+              {shippingAddress.deliveryInstructions && (
                 <div>
-                  <strong>Delivery Instructions:</strong> {address.deliveryInstructions}
+                  <strong>Delivery Instructions:</strong> {shippingAddress.deliveryInstructions}
                 </div>
               )}
             </div>
@@ -60,15 +90,15 @@ const OrderStatus = ({ orderDetails }) => {
               <FiPackage className="section-icon" /> Order Summary
             </h3>
             <div className="order-items-list">
-              {cartItems.map((item, index) => (
+              {items.map((item, index) => (
                 <div key={index} className="order-item">
                   <div className="item-info">
                     <span className="item-name">
-                      {item?.product?.name ?? "Unnamed Product"} × {item?.quantity ?? 0}
+                      {item?.productName ?? "Unnamed Product"} × {item?.quantity ?? 0}
                       {item?.flavour && <span className="item-flavor"> ({item.flavour})</span>}
                     </span>
                     <span className="item-price">
-                      £ {((item?.product?.price || 0) * (item?.quantity || 0)).toFixed(2)}
+                      £ {((item?.price || 0) * (item?.quantity || 0)).toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -86,10 +116,13 @@ const OrderStatus = ({ orderDetails }) => {
               </div>
               <div className="total-row grand-total">
                 <span>Total {paymentMethod === "cod" ? "Payable" : "Paid"}</span>
-                <span>£ {total.toFixed(2)}</span>
+                <span>£ {totalAmount.toFixed(2)}</span>
               </div>
               <div className="payment-method">
                 <strong>Payment Method:</strong> {paymentMethod === "cod" ? "Cash on Delivery" : "Online Payment"}
+                {!paymentStatus && paymentMethod !== "cod" && (
+                  <span className="payment-pending"> (Pending)</span>
+                )}
               </div>
             </div>
           </div>
@@ -104,7 +137,7 @@ const OrderStatus = ({ orderDetails }) => {
           </button>
           <button
             className="view-orders-btn"
-            onClick={() => navigate("/cart")}
+            onClick={() => navigate("/orders")}
           >
             View My Orders
           </button>
@@ -115,5 +148,3 @@ const OrderStatus = ({ orderDetails }) => {
 };
 
 export default OrderStatus;
-
- 
