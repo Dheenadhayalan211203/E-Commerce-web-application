@@ -1013,3 +1013,71 @@ button:disabled {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+
+
+/* Search container */
+.admin-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 300px;
+  margin: 0 15px;
+  background-color: #f5f5f5;
+  border-radius: 20px;
+  padding: 5px 15px;
+  transition: all 0.3s ease;
+  border: 1px solid #ddd;
+}
+
+.admin-search-container:focus-within {
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: #80bdff;
+}
+
+/* Search icon */
+.admin-search-icon {
+  color: #777;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+/* Search input */
+.admin-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  font-size: 14px;
+  outline: none;
+  color: #333;
+}
+
+.admin-search-input::placeholder {
+  color: #999;
+}
+
+/* Clear search button */
+.admin-clear-search {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 5px;
+  margin-left: 5px;
+  font-size: 12px;
+  transition: color 0.2s;
+}
+
+.admin-clear-search:hover {
+  color: #666;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-search-container {
+    width: 100%;
+    margin: 10px 0;
+  }
+}

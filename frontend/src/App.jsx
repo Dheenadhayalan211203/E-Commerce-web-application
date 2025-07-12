@@ -25,6 +25,7 @@ import PaymentPage from "./components/PaymentPage";
 import Mycart from "./pages/Mycart";
 import CategoryPage from "./pages/Catogerypage";
 import BrandPage from "./pages/Brandpage";
+import SearchResult from "./components/SearchResult";
 
 // Global App Context
 export const usecontext = createContext();
@@ -92,6 +93,7 @@ function App() {
             <Route path="/checkout" element={<PaymentPage />} />
             <Route path="/category/:name" element={<CategoryPage />} />
             <Route path="/brand/:name" element={<BrandPage />} />
+            <Route path="/search/:productName" element={<SearchResult />} />
             <Route
               path="/admin/product"
               element={

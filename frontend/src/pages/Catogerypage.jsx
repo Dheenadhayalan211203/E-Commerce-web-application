@@ -7,79 +7,74 @@ import './CatogeryPage.css';
 import Catnav from '../components/Catnav';
 
 const CategoryPage = () => {
-  const { name } = useParams();
-  const { products } = useContext(usecontext);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showNotFound, setShowNotFound] = useState(false);
+  const { name } = useParams(); // can be "Main/Sub" or just "Main"
+  const { products } = useContext(usecontext);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showNotFound, setShowNotFound] = useState(false);
 
-  useEffect(() => {
-    // Set a 60-second timeout to show "not found" message
-    const notFoundTimer = setTimeout(() => {
-      if (isLoading) {
-        setShowNotFound(true);
-        setIsLoading(false);
-      }
-    }, 60000); // 60 seconds
+  useEffect(() => {
+    if (!products || products.length === 0) return;
 
-    return () => clearTimeout(notFoundTimer);
-  }, [isLoading]);
+    let mainCategory = name;
+    let subCategory = null;
 
-  useEffect(() => {
-    if (products) {
-      const matched = products.filter(p => p.category === name);
-      setFilteredProducts(matched);
-      
-      if (products.length === 0) {
-        // If context returns empty array, keep loading for 60 seconds
-        return;
-      }
-      
-      setIsLoading(false);
-      setShowNotFound(matched.length === 0);
-    }
-  }, [name, products]);
+    if (name.includes('/')) {
+      const parts = name.split('/');
+      mainCategory = decodeURIComponent(parts[0]);
+      subCategory = decodeURIComponent(parts[1]);
+    } else {
+      mainCategory = decodeURIComponent(name);
+    }
 
-  // Loading animation component
-  const LoadingAnimation = () => (
-    <div className="loading-container">
-      <div className="loading-spinner"></div>
-      <p className="loading-text">Loading products for {name}...</p>
-      <p className="loading-subtext">Please wait while we fetch the items</p>
-    </div>
-  );
+    const matched = products.filter(p =>
+      p.category === mainCategory &&
+      (subCategory ? p.product_group === subCategory : true)
+    );
 
-  // No products found component
-  const NotFoundMessage = () => (
-    <div className="not-found-container">
-      <div className="not-found-icon">😕</div>
-      <h3>No Products Found</h3>
-      <p>We couldn't find any products in the {name} category.</p>
-      <p className="subtext">Please check back later or try another category</p>
-    </div>
-  );
+    setFilteredProducts(matched);
+    setIsLoading(false);
+    setShowNotFound(matched.length === 0);
+  }, [name, products]);
 
-  return (
-    <div className="category-page">
-      <section className="navi">
-         <Navigation />
-      </section>
+  const LoadingAnimation = () => (
+    <div className="loading-container">
+      <div className="loading-spinner"></div>
+      <p className="loading-text">Loading products for {name}...</p>
+      <p className="loading-subtext">Please wait while we fetch the items</p>
+    </div>
+  );
 
-      <Catnav/>
-      
-      <div className="category-content">
-        <h2 className="category-title">{name}</h2>
-        
-        {isLoading ? (
-          <LoadingAnimation />
-        ) : showNotFound || filteredProducts.length === 0 ? (
-          <NotFoundMessage />
-        ) : (
-          <ProductCard customProducts={filteredProducts} />
-        )}
-      </div>
-    </div>
-  );
+  const NotFoundMessage = () => (
+    <div className="not-found-container">
+      <div className="not-found-icon">😕</div>
+      <h3>No Products Found</h3>
+      <p>We couldn't find any products in the {name} category.</p>
+      <p className="subtext">Please check back later or try another category</p>
+    </div>
+  );
+
+  return (
+    <div className="category-page">
+      <section className="navi">
+        <Navigation />
+      </section>
+
+      <Catnav />
+
+      <div className="category-content">
+        <h2 className="category-title">{decodeURIComponent(name)}</h2>
+
+        {isLoading ? (
+          <LoadingAnimation />
+        ) : showNotFound || filteredProducts.length === 0 ? (
+          <NotFoundMessage />
+        ) : (
+          <ProductCard customProducts={filteredProducts} />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default CategoryPage;

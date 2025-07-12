@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AdminProductList.css';
- 
 
 const AdminProductList = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [localLoading, setLocalLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [editingProduct, setEditingProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
@@ -21,6 +22,7 @@ const AdminProductList = () => {
         `${import.meta.env.VITE_API_BASE_URL || "https://e-commerce-web-application-k9ho.onrender.com"}/api/admin/products`
       );
       setProducts(response.data);
+      setFilteredProducts(response.data);
     } catch (err) {
       setError('Failed to fetch products');
       console.error('Fetch products error:', err);
@@ -33,12 +35,21 @@ const AdminProductList = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const results = products.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.category && product.category.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredProducts(results);
+  }, [searchTerm, products]);
+
   const handleDelete = async (productId) => {
     if (!window.confirm('Are you sure you want to delete this product?')) return;
     try {
       setLocalLoading(true);
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com/api/products'}/api/admin/products/${productId}`
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}`
       );
       setSuccess('Product deleted successfully');
       fetchProducts();
@@ -55,7 +66,7 @@ const AdminProductList = () => {
     try {
       setLocalLoading(true);
       await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com/api/products'}/api/admin/products/${productId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}/status`,
         { is_active: !currentStatus }
       );
       setSuccess(`Product ${currentStatus ? 'deactivated' : 'activated'} successfully`);
@@ -175,7 +186,7 @@ const AdminProductList = () => {
     try {
       setLocalLoading(true);
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com/api/products'}/api/admin/products/${editingProduct.id}`,
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${editingProduct.id}`,
         editingProduct
       );
       setSuccess('Product updated successfully');
@@ -192,7 +203,7 @@ const AdminProductList = () => {
 
   return (
     <div className="admin-product-list-container">
-      {/* Global Loading Popup */}
+      {/* Loading indicators */}
       {loading && (
         <div className="admin-loading-popup">
           <div className="admin-loading-spinner"></div>
@@ -200,45 +211,74 @@ const AdminProductList = () => {
         </div>
       )}
 
-      {/* Local Loading Popup */}
       {localLoading && (
         <div className="admin-local-loading-popup">
           <div className="admin-loading-spinner"></div>
         </div>
       )}
 
-      <button onClick={() => navigate(-1)} className="admin-back-button">
-        <i className="fas fa-arrow-left"></i> Back to Dashboard
-      </button>
-      
+      {/* Header section */}
       <div className="admin-product-list-header">
+        <button onClick={() => navigate(-1)} className="admin-back-button">
+          <i className="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+        
         <h1><i className="fas fa-cubes"></i> Product Management</h1>
-        <button 
-          onClick={() => navigate('/admin/product/new')} 
-          className="admin-add-product-button"
-        >
-          <i className="fas fa-plus"></i> Add New Product
-        </button>
+        
+        <div className="admin-search-container">
+          <i className="fas fa-search admin-search-icon"></i>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="admin-search-input"
+          />
+          {searchTerm && (
+            <button 
+              onClick={() => setSearchTerm('')} 
+              className="admin-clear-search"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          )}
+        </div>
 
-        <button 
-          onClick={() => navigate('/admin/product/category')} 
-          className="admin-add-category-button"
-        >
-          <i className="fas fa-plus"></i> Add New Category
-        </button>
+        <div className="admin-action-buttons">
+          <button 
+            onClick={() => navigate('/admin/product/new')} 
+            className="admin-add-product-button"
+          >
+            <i className="fas fa-plus"></i> Add New Product
+          </button>
+          <button 
+            onClick={() => navigate('/admin/product/category')} 
+            className="admin-add-category-button"
+          >
+            <i className="fas fa-plus"></i> Add New Category
+          </button>
+        </div>
       </div>
 
+      {/* Messages */}
       {error && (
         <div className="admin-message admin-error-message">
           <i className="fas fa-exclamation-circle"></i> {error}
+          <button onClick={() => setError('')} className="admin-message-close">
+            <i className="fas fa-times"></i>
+          </button>
         </div>
       )}
       {success && (
         <div className="admin-message admin-success-message">
           <i className="fas fa-check-circle"></i> {success}
+          <button onClick={() => setSuccess('')} className="admin-message-close">
+            <i className="fas fa-times"></i>
+          </button>
         </div>
       )}
 
+      {/* Product list */}
       {loading && !products.length ? (
         <div className="admin-loading">
           <div className="admin-spinner"></div>
@@ -246,10 +286,10 @@ const AdminProductList = () => {
         </div>
       ) : (
         <div className="admin-product-list">
-          {products.length === 0 ? (
+          {filteredProducts.length === 0 ? (
             <div className="admin-no-products">
               <i className="fas fa-box-open"></i>
-              <p>No products found</p>
+              <p>{searchTerm ? 'No matching products found' : 'No products found'}</p>
               <button 
                 onClick={() => navigate('/admin/product/new')} 
                 className="admin-add-product-button"
@@ -273,7 +313,7 @@ const AdminProductList = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map(product => (
+                  {filteredProducts.map(product => (
                     <tr key={product.id}>
                       <td>
                         {product.image_base64 && (
@@ -621,7 +661,6 @@ const AdminProductList = () => {
           </div>
         </div>
       )}
-       
     </div>
   );
 };

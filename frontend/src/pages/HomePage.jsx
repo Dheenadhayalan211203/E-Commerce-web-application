@@ -18,6 +18,8 @@ import PaymentPage from "../components/PaymentPage";
 import BrandsSection from "../components/BrandSection";
 import CategoryProductDisplay from "../components/CategoryProductDisplay";
 import NewArrivals from "../components/NewArrivals";
+import SearchResult from "../components/SearchResult";
+import SearchBar from "../components/SearchBar";
  
 
 
@@ -67,7 +69,10 @@ const HomePage = () => {
         <div className="navi">
           <Navigation />
         </div>
+         
           <Catnav/>
+
+          <div className="searchbar"><SearchBar/></div>
           <div className="brand">
 
             <div className="newarr">
