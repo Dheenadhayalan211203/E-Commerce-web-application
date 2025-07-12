@@ -1,0 +1,107 @@
+/* MiniProductCard.css */
+.mini-product-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  cursor: pointer;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mini-product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.mini-product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    #FF9A8B 0%, 
+    #FF6B95 20%, 
+    #FF8E53 40%, 
+    #FFCA3A 60%, 
+    #6BD6FF 80%, 
+    #8A2BE2 100%);
+}
+
+.mini-product-img {
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f8f9fa; /* Fallback background */
+}
+
+.mini-product-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Changed from cover to contain */
+  padding: 15px; /* Added padding */
+  transition: transform 0.6s ease;
+  max-width: 80%; /* Prevent over-zooming */
+  max-height: 80%;
+}
+
+.mini-product-card:hover .mini-product-img img {
+  transform: scale(1.05); /* Reduced zoom level */
+}
+
+.mini-product-info {
+  padding: 1.2rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.95) 100%);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.mini-product-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mini-product-brand {
+  font-size: 0.85rem;
+  color: #6e45e2;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+.mini-product-price {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin-top: auto;
+  background: linear-gradient(90deg, #6BD6FF, #8A2BE2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* Animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.mini-product-card:hover {
+  animation: float 3s ease-in-out infinite;
+}

@@ -7,8 +7,8 @@ import OrderStatus from "./OrderStatus";
 import "./PaymentPage.css";
 
 const api = axios.create({
-  baseURL: "https://e-commerce-web-application-k9ho.onrender.com",
-  timeout: 10000,
+  baseURL: "http://localhost:5000",
+  timeout: 20000,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

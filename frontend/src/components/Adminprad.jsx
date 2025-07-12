@@ -6,7 +6,6 @@ import "./AdminPrad.css";
 const AdminProductForm = () => {
   const navigate = useNavigate();
   const productImageInputRef = useRef(null);
-  const flavorImageInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -34,8 +33,6 @@ const AdminProductForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [newFlavor, setNewFlavor] = useState({
     name: "",
-    image: null,
-    imagePreview: "",
     stock: "0",
     vat: "20", // Default VAT percentage
   });
@@ -43,12 +40,11 @@ const AdminProductForm = () => {
   // Clean up object URLs
   useEffect(() => {
     return () => {
-      if (newFlavor.imagePreview) URL.revokeObjectURL(newFlavor.imagePreview);
       if (formData.image_base64 && formData.image_base64.startsWith("blob:")) {
         URL.revokeObjectURL(formData.image_base64);
       }
     };
-  }, [newFlavor.imagePreview, formData.image_base64]);
+  }, [formData.image_base64]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -115,36 +111,9 @@ const AdminProductForm = () => {
     return "";
   };
 
-  const handleFlavorImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const error = validateImage(file, 2 * 1024 * 1024);
-    if (error) {
-      setErrors((prev) => ({ ...prev, flavors: error }));
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setNewFlavor((prev) => ({
-        ...prev,
-        image: reader.result,
-        imagePreview: URL.createObjectURL(file),
-      }));
-    };
-    reader.readAsDataURL(file);
-    flavorImageInputRef.current.value = "";
-  };
-
   const addFlavor = () => {
     if (!newFlavor.name.trim()) {
       setErrors((prev) => ({ ...prev, flavors: "Flavor name is required" }));
-      return;
-    }
-
-    if (!newFlavor.image) {
-      setErrors((prev) => ({ ...prev, flavors: "Flavor image is required" }));
       return;
     }
 
@@ -166,11 +135,6 @@ const AdminProductForm = () => {
       return;
     }
 
-    const cleanImageString = newFlavor.image.replace(
-      /^data:image\/\w+;base64,/,
-      ""
-    );
-
     setFormData((prev) => ({
       ...prev,
       flavors_data: {
@@ -178,7 +142,6 @@ const AdminProductForm = () => {
           ...prev.flavors_data.flavours,
           {
             flr: newFlavor.name.trim(),
-            imagestring: cleanImageString,
             stock: parseInt(newFlavor.stock) || 0,
             vat: parseFloat(newFlavor.vat) || 20,
           },
@@ -188,8 +151,6 @@ const AdminProductForm = () => {
 
     setNewFlavor({
       name: "",
-      image: null,
-      imagePreview: "",
       stock: "0",
       vat: "20",
     });
@@ -402,12 +363,15 @@ const AdminProductForm = () => {
               className="admin-input-field"
             >
                   <option value="">Select Category</option>   {" "}
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.name}>
-                  {cat.name}
-                </option>
-              ))}
-               {" "}
+                  <option value="2025 Legal Big Puffs">2025 Legal Big Puffs</option>
+                  <option value="Compliant 600 Puffs">Compliant 600 Puffs</option>
+                  <option value="Nicotine Salts">Nicotine Salts</option>
+                  <option value="Nicotine Pouches">Nicotine Pouches</option>
+                  <option value="Pods">Pods</option>
+                  <option value="Ambient">Ambient</option>
+                  <option value="Vape">Vape</option>
+                  <option value="SmokingDubai Chocolate">SmokingDubai Chocolate</option>
+               
             </select>
           </div>
 
@@ -489,9 +453,7 @@ const AdminProductForm = () => {
 
           {/* Add New Flavor */}
           <div className="admin-input-group">
-            <label className="admin-input-label">
-              Add New Flavor (max 2MB)
-            </label>
+            <label className="admin-input-label">Add New Flavor</label>
             <div className="admin-flavor-form-grid">
               <div className="admin-flavor-input-group">
                 <input
@@ -506,9 +468,7 @@ const AdminProductForm = () => {
                 />
               </div>
               <div className="admin-flavor-input-group">
-                <label className="admin-input-label">
-                Available Stock
-            </label>
+                <label className="admin-input-label">Available Stock</label>
                 <input
                   type="number"
                   name="stock"
@@ -522,9 +482,7 @@ const AdminProductForm = () => {
                 />
               </div>
               <div className="admin-flavor-input-group">
-                <label className="admin-input-label">
-                 VAT %
-            </label>
+                <label className="admin-input-label">VAT %</label>
                 <input
                   type="number"
                   name="vat"
@@ -539,24 +497,6 @@ const AdminProductForm = () => {
                 />
               </div>
               <div className="admin-flavor-input-group">
-                <div className="admin-file-upload">
-                  <input
-                    type="file"
-                    id="flavor-image-upload"
-                    accept="image/*"
-                    onChange={handleFlavorImageChange}
-                    className="admin-file-input"
-                    ref={flavorImageInputRef}
-                  />
-                  <label
-                    htmlFor="flavor-image-upload"
-                    className="admin-file-upload-button"
-                  >
-                    {newFlavor.image ? "Change Image" : "Select Flavor Image"}
-                  </label>
-                </div>
-              </div>
-              <div className="admin-flavor-input-group">
                 <button
                   type="button"
                   onClick={addFlavor}
@@ -568,16 +508,6 @@ const AdminProductForm = () => {
             </div>
             {errors.flavors && (
               <span className="admin-field-error">{errors.flavors}</span>
-            )}
-            {newFlavor.imagePreview && (
-              <div className="admin-image-preview-container">
-                <img
-                  src={newFlavor.imagePreview}
-                  alt="Flavor Preview"
-                  className="admin-image-preview"
-                  style={{ maxHeight: "100px" }}
-                />
-              </div>
             )}
           </div>
 
@@ -592,14 +522,6 @@ const AdminProductForm = () => {
                     <div className="admin-flavor-details">
                       <div>Stock: {flavor.stock}</div>
                       <div>VAT: {flavor.vat}%</div>
-                    </div>
-                    <div className="admin-image-preview-container">
-                      <img
-                        src={`data:image/jpeg;base64,${flavor.imagestring}`}
-                        alt={flavor.flr}
-                        className="admin-image-preview"
-                        style={{ maxHeight: "80px" }}
-                      />
                     </div>
                     <button
                       type="button"

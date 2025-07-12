@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './AdminProductList.css';
+ 
 
 const AdminProductList = () => {
   const [products, setProducts] = useState([]);
@@ -17,7 +18,7 @@ const AdminProductList = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products`
+        `${import.meta.env.VITE_API_BASE_URL || "https://e-commerce-web-application-k9ho.onrender.com"}/api/admin/products`
       );
       setProducts(response.data);
     } catch (err) {
@@ -37,7 +38,7 @@ const AdminProductList = () => {
     try {
       setLocalLoading(true);
       await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}`
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com/api/products'}/api/admin/products/${productId}`
       );
       setSuccess('Product deleted successfully');
       fetchProducts();
@@ -54,7 +55,7 @@ const AdminProductList = () => {
     try {
       setLocalLoading(true);
       await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${productId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com/api/products'}/api/admin/products/${productId}/status`,
         { is_active: !currentStatus }
       );
       setSuccess(`Product ${currentStatus ? 'deactivated' : 'activated'} successfully`);
@@ -127,35 +128,17 @@ const AdminProductList = () => {
     });
   };
 
-  const handleFlavorImageUpload = (e, index) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!file.type.match('image.*')) {
-      setError('Please select an image file');
-      return;
-    }
-
-    if (file.size > 1 * 1024 * 1024) {
-      setError('Flavor image size should be less than 1MB');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result.split(',')[1];
-      setEditingProduct(prev => {
-        const updatedFlavors = [...prev.flavors_data.flavours];
-        updatedFlavors[index].imagestring = base64String;
-        return {
-          ...prev,
-          flavors_data: {
-            flavours: updatedFlavors
-          }
-        };
-      });
-    };
-    reader.readAsDataURL(file);
+  const removeFlavorImage = (index) => {
+    setEditingProduct(prev => {
+      const updatedFlavors = [...prev.flavors_data.flavours];
+      updatedFlavors[index].imagestring = '';
+      return {
+        ...prev,
+        flavors_data: {
+          flavours: updatedFlavors
+        }
+      };
+    });
   };
 
   const removeFlavor = (index) => {
@@ -179,7 +162,6 @@ const AdminProductList = () => {
           ...prev.flavors_data.flavours,
           { 
             flr: '', 
-            imagestring: '',
             stock: 0,
             vat: 20
           }
@@ -193,7 +175,7 @@ const AdminProductList = () => {
     try {
       setLocalLoading(true);
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com'}/api/admin/products/${editingProduct.id}`,
+        `${import.meta.env.VITE_API_BASE_URL || 'https://e-commerce-web-application-k9ho.onrender.com/api/products'}/api/admin/products/${editingProduct.id}`,
         editingProduct
       );
       setSuccess('Product updated successfully');
@@ -576,21 +558,6 @@ const AdminProductList = () => {
                         />
                       </div>
 
-                      <div className="admin-flavor-input-group">
-                        <label>Image</label>
-                        <label className="admin-image-upload-label">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleFlavorImageUpload(e, index)}
-                            className="admin-image-upload-input"
-                          />
-                          <span className="admin-image-upload-button">
-                            {flavor.imagestring ? 'Change Image' : 'Add Image'}
-                          </span>
-                        </label>
-                      </div>
-
                       {flavor.imagestring && (
                         <div className="admin-current-image-container">
                           <img
@@ -598,6 +565,13 @@ const AdminProductList = () => {
                             alt={flavor.flr}
                             className="admin-flavor-image-preview"
                           />
+                          <button
+                            type="button"
+                            onClick={() => removeFlavorImage(index)}
+                            className="admin-remove-image-button"
+                          >
+                            <i className="fas fa-times"></i>
+                          </button>
                         </div>
                       )}
 
@@ -647,6 +621,7 @@ const AdminProductList = () => {
           </div>
         </div>
       )}
+       
     </div>
   );
 };

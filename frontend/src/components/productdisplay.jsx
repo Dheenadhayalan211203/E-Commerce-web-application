@@ -1,5 +1,3 @@
-// ✅ Fully Revised ProductDisplay.jsx with Fallbacks
-
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { usecontext } from "../App";
@@ -51,20 +49,23 @@ const ProductDisplay = () => {
             : null;
           const parsedFlavors = parsed?.flavours || [];
           setFlavors(parsedFlavors);
+          
+          // Set main image to product image initially
+          if (selectedProduct.image_base64) {
+            setMainImage(`data:image/jpeg;base64,${selectedProduct.image_base64}`);
+          }
+          
           if (parsedFlavors.length > 0) {
             setSelectedFlavor(parsedFlavors[0]);
-            setMainImage(
-              `data:image/jpeg;base64,${parsedFlavors[0].imagestring}`
-            );
-          } else if (selectedProduct.image_base64) {
-            setMainImage(
-              `data:image/jpeg;base64,${selectedProduct.image_base64}`
-            );
+            // Only update main image if flavor has an image
+            if (parsedFlavors[0].imagestring) {
+              setMainImage(`data:image/jpeg;base64,${parsedFlavors[0].imagestring}`);
+            }
           }
         } catch {
-          setMainImage(
-            `data:image/jpeg;base64,${selectedProduct.image_base64 || ""}`
-          );
+          if (selectedProduct.image_base64) {
+            setMainImage(`data:image/jpeg;base64,${selectedProduct.image_base64}`);
+          }
         }
       }
 
@@ -121,7 +122,7 @@ const ProductDisplay = () => {
         <div className="product-images">
           <div className="main-image-container">
             <img
-              src={mainImage}
+              src={mainImage || "https://via.placeholder.com/500x500?text=No+Image"}
               alt={selectedFlavor?.flr || product.name}
               className="main-image"
             />
@@ -144,10 +145,11 @@ const ProductDisplay = () => {
                     }`}
                     onClick={() => {
                       setSelectedFlavor(flavor);
+                      // Only update main image if flavor has an image, otherwise keep product image
                       if (flavor.imagestring) {
-                        setMainImage(
-                          `data:image/jpeg;base64,${flavor.imagestring}`
-                        );
+                        setMainImage(`data:image/jpeg;base64,${flavor.imagestring}`);
+                      } else if (product.image_base64) {
+                        setMainImage(`data:image/jpeg;base64,${product.image_base64}`);
                       }
                     }}
                   >
